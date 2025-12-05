@@ -7,26 +7,26 @@
 
 #include "input.c"
 
-void game_update()
+void game_update(AppState* as)
 {
 	
 }
 
-void build_render_list()
+void build_render_list(AppState* as)
 {
 	
 }
 
-void build_audio_list()
+void build_audio_list(AppState* as)
 {
 	
 }
 
 void game_step(AppState* as)
 {
-	platform_input();	
-	game_input();
-	game_update();
-	build_render_list();
-	build_audio_list();
+	platform_input(as);	
+	game_input(as);
+	game_update(as);
+	build_render_list(as);
+	build_audio_list(as);
 }
