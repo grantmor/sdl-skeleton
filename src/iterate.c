@@ -5,7 +5,7 @@
 
 #include "types.h"
 
-SDL_AppResult game_iterate(void* appstate)
+SDL_AppResult platform_iterate(void* appstate)
 {
 	AppState* as = (AppState*) appstate;
 	SDL_SetRenderDrawColorFloat(as->renderer, 0.0,0.0,1.0,1.0);

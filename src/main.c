@@ -12,20 +12,20 @@
 
 SDL_AppResult SDL_AppInit(void** appstate, int argc, char *argv[])
 {
-	return game_init(appstate);
+	return platform_init(appstate);
 }
 
 SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event)
 {
-	return game_event(appstate, event);
+	return platform_event(appstate, event);
 }
 
 SDL_AppResult SDL_AppIterate(void* appstate)
 {
-	return game_iterate(appstate);
+	return platform_iterate(appstate);
 }
 
 void SDL_AppQuit(void* appstate, SDL_AppResult result)
 {
-	game_quit(appstate);
+	platform_quit(appstate);
 }

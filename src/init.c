@@ -5,7 +5,7 @@
 
 #include "types.h"
 
-SDL_AppResult game_init(void** appstate)
+SDL_AppResult platform_init(void** appstate)
 {
 	SDL_SetAppMetadata("SDL3 Skeleton", "0.1", "sgz");
 
@@ -17,7 +17,6 @@ SDL_AppResult game_init(void** appstate)
 
 	AppState* as = (AppState*) SDL_calloc(1, sizeof(AppState));
 	//TODO: error handling
-
 
 	if (!SDL_CreateWindowAndRenderer("SDL3 Skeleton", 640, 480, SDL_WINDOW_RESIZABLE, &as->window, &as->renderer))
 	{

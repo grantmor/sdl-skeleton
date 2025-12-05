@@ -7,7 +7,7 @@
 
 #include "types.h"
 
-void game_quit(void* appstate)
+void platform_quit(void* appstate)
 {
 	AppState* as = (AppState*) appstate;
 
