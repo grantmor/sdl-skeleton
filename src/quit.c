@@ -7,13 +7,12 @@
 
 #include "types.h"
 
-void  game_quit(void* appstate)
+void game_quit(void* appstate)
 {
 	AppState* as = (AppState*) appstate;
 
 	SDL_DestroyRenderer(as->renderer);
 	SDL_DestroyWindow(as->window);
-
 
 	SDL_free(as);
 }
