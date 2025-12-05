@@ -7,10 +7,8 @@
 
 #include "types.h"
 
-void platform_quit(void* appstate)
+void platform_quit(AppState* as)
 {
-	AppState* as = (AppState*) appstate;
-
 	SDL_DestroyRenderer(as->renderer);
 	SDL_DestroyWindow(as->window);
 

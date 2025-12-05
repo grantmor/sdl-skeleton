@@ -4,13 +4,20 @@
 #include <SDL3/SDL_init.h>
 
 #include "types.h"
+#include "game_update.c"
 
-SDL_AppResult platform_iterate(void* appstate)
+void platform_render(AppState* as)
 {
-	AppState* as = (AppState*) appstate;
 	SDL_SetRenderDrawColorFloat(as->renderer, 0.0,0.0,1.0,1.0);
 	SDL_RenderClear(as->renderer);
 	SDL_RenderPresent(as->renderer);
+}
+
+SDL_AppResult platform_iterate(AppState* as)
+{
+
+	game_step(as);
+	platform_render(as);
 
 	return SDL_APP_CONTINUE;
 }

@@ -16,15 +16,15 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char *argv[])
 
 SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event)
 {
-	return platform_event(appstate, event);
+	return platform_event( (AppState*) appstate, event);
 }
 
 SDL_AppResult SDL_AppIterate(void* appstate)
 {
-	return platform_iterate(appstate);
+	return platform_iterate( (AppState*) appstate);
 }
 
 void SDL_AppQuit(void* appstate, SDL_AppResult result)
 {
-	platform_quit(appstate);
+	platform_quit( (AppState*) appstate);
 }

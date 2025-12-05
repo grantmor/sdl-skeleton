@@ -6,9 +6,8 @@
 
 #include "types.h"
 
-SDL_AppResult platform_event(void* appstate, SDL_Event* event)
+SDL_AppResult platform_event(AppState* as, SDL_Event* event)
 {
-	AppState* as = (AppState*) appstate;
 
 	if (event->type == SDL_EVENT_QUIT)
 	{
