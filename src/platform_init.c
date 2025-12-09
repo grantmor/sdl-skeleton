@@ -1,7 +1,11 @@
 #pragma once
 
 #include <SDL3/SDL.h>
+#include <SDL3/SDL_gamepad.h>
 #include <SDL3/SDL_init.h>
+#include <SDL3/SDL_oldnames.h>
+#include <SDL3/SDL_stdinc.h>
+#include <SDL3/SDL_timer.h>
 
 #include "types.h"
 
@@ -9,15 +13,21 @@ SDL_AppResult platform_init(void** appstate)
 {
 	SDL_SetAppMetadata("SDL3 Skeleton", "0.1", "sgz");
 
-	if (!SDL_Init(SDL_INIT_VIDEO))
+	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD);
+
+	/*
+	if (init_result)
 	{
 		SDL_Log("Failed to initialize SDL: %s.", SDL_GetError());
+		
 		return SDL_APP_FAILURE;
 	}
+	*/
 
 	AppState* as = (AppState*) SDL_calloc(1, sizeof(AppState));
 	//TODO: error handling
 
+	// Video
 	if (!SDL_CreateWindowAndRenderer("SDL3 Skeleton", 640, 480, SDL_WINDOW_RESIZABLE, &as->window, &as->renderer))
 	{
 		SDL_Log("Failed to create window/renderer: %s.", SDL_GetError());
@@ -26,7 +36,31 @@ SDL_AppResult platform_init(void** appstate)
 
 	SDL_SetRenderLogicalPresentation(as->renderer, 320, 180, SDL_LOGICAL_PRESENTATION_LETTERBOX);
 
+	// Input
+	i32 num_gamepads; 
+	SDL_JoystickID *ids =SDL_GetGamepads(&num_gamepads);
+
+	// Handle multiple controllers later
+	if (num_gamepads > 0)
+	{
+		SDL_Gamepad* controller = SDL_OpenGamepad(ids[0]);
+		if (!controller)
+		{
+			SDL_Log("Failed to open gamepad: %s\n", SDL_GetError());
+		}
+		else
+		{
+			SDL_Log("Gamepad Name: %s\n", SDL_GetGamepadName(controller));
+			as->sdl_gamepad = controller;
+			ControllerState* cs = SDL_malloc(sizeof(ControllerState));
+			as->controller_state = cs;
+		}
+
+	}
+
 	*appstate = as;
+
+	as->last_time = SDL_GetPerformanceCounter();
 	
 	return SDL_APP_CONTINUE;
 }

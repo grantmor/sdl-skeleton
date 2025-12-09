@@ -20,7 +20,6 @@ void platform_audio(AppState* as)
 
 SDL_AppResult platform_iterate(AppState* as)
 {
-
 	game_step(as);
 	platform_render(as);
 	platform_audio(as);
