@@ -3,8 +3,7 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_init.h>
 
-#include "types.h"
-
+#include "platform_sdl.h"
 #include "input.c"
 
 void game_update(AppState* as)

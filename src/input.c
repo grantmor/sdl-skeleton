@@ -1,14 +1,18 @@
 #pragma once
 
-#include "types.h"
 #include <SDL3/SDL_gamepad.h>
 
-#define AXIS_DEADZONE 250
+#include "types.h"
+#include "platform_sdl.h"
+
+#define AXIS_DEADZONE 25
 
 typedef enum {
 	NEGATIVE,
 	POSITIVE
 } Sign;
+
+
 
 bool is_axis_pressed(SDL_Gamepad* gp, SDL_GamepadAxis axis, Sign sign, i16 threshold)
 {

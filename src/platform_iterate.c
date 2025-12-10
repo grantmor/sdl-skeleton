@@ -3,7 +3,6 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_init.h>
 
-#include "types.h"
 #include "game_update.c"
 
 void platform_render(AppState* as)

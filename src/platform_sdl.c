@@ -2,8 +2,6 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 
-#include "types.h"
-
 #include "platform_iterate.c"
 #include "platform_init.c"
 #include "platform_event.c"
