@@ -100,9 +100,18 @@ typedef struct {
 } KeyboardState;
 
 typedef struct {
+	f64 last_time;
+	f64 cur_time;
+	f64 dt;
+	f64 fps_avg;
+	u64 frame_counter;
+} Time;
+
+typedef struct {
 	SDL_Window* window;
 	SDL_Renderer* renderer;
-	u64 last_time;
+
+	Time* time;
 
 	//Input
 	SDL_Gamepad* sdl_gamepad;

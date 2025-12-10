@@ -9,6 +9,8 @@
 
 #define AXIS_DEADZONE 25
 
+//TODO: Add features of mapping keys and gamepad controls to "Actions"
+
 bool is_axis_pressed(SDL_Gamepad* gp, SDL_GamepadAxis axis, Sign sign, i16 threshold)
 {
 	//i8 pn = ((sign == POSITIVE) ? 1 : -1);

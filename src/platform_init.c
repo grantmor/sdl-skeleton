@@ -62,9 +62,16 @@ SDL_AppResult platform_init(void** appstate)
 	KeyboardState* ks = (KeyboardState*) SDL_calloc(1, sizeof(KeyboardState));
 	as->keyboard_state = ks;
 
-	*appstate = as;
+	// Time
+	Time* time = (Time*) SDL_calloc(1, sizeof(Time));
+	time->last_time = (f64)SDL_GetPerformanceCounter() / (f64) SDL_GetPerformanceFrequency();
+	time->frame_counter = 0;
+	time->cur_time = 0;
+	time->dt = 0;
+	time->fps_avg = 0;
 
-	as->last_time = SDL_GetPerformanceCounter();
+	as->time = time;
 	
+	*appstate = as;
 	return SDL_APP_CONTINUE;
 }
