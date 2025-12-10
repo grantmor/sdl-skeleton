@@ -2,6 +2,7 @@
 
 #include <SDL3/SDL_gamepad.h>
 #include <SDL3/SDL_keyboard.h>
+#include <SDL3/SDL_stdinc.h>
 
 #include "types.h"
 #include "platform_sdl.h"
@@ -114,84 +115,36 @@ void game_input(AppState* as)
 	ControllerState* cs = as->controller_state;	
 
 	// Face Buttons
-	if (cs->button_north)
-	{
-		SDL_Log("North Button");
-	}
-	if (cs->button_south)
-	{
-		SDL_Log("South Button");
-	}
-	if (cs->button_east)
-	{
-		SDL_Log("East Button");
-	}
-	if (cs->button_west)
-	{
-		SDL_Log("West Button");
-	}
+	if (cs->button_north) SDL_Log("North Button");
+	if (cs->button_south) SDL_Log("South Button");
+	if (cs->button_east) SDL_Log("East Button");
+	if (cs->button_west) SDL_Log("West Button");
 
 	// DPAD
-	if (cs->dpad_up)
-	{
-		SDL_Log("DPAD Up");
-	}
-	if (cs->dpad_down)
-	{
-		SDL_Log("DPAD Down");
-	}
-	if (cs->dpad_left)
-	{
-		SDL_Log("DPAD Left");
-	}
-	if (cs->dpad_right)
-	{
-		SDL_Log("DPAD Right");
-	}
+	if (cs->dpad_up) SDL_Log("DPAD Up");
+	if (cs->dpad_down) SDL_Log("DPAD Down");
+	if (cs->dpad_left) SDL_Log("DPAD Left");
+	if (cs->dpad_right) SDL_Log("DPAD Right");
 
 	// Shoulder
-	if (cs->shoulder_left)
-	{
-		SDL_Log("Left Shoulder");
-	}
-	if (cs->shoulder_right)
-	{
-		SDL_Log("Right Shoulder");
-	}
-	if (cs->trigger_left)
-	{
-		SDL_Log("Left Trigger");
-	}
-	if (cs->trigger_right)
-	{
-		SDL_Log("Right Trigger");
-	}
+	if (cs->shoulder_left) SDL_Log("Left Shoulder");
+	if (cs->shoulder_right) SDL_Log("Right Shoulder");
+	if (cs->trigger_left) SDL_Log("Left Trigger");
+	if (cs->trigger_right) SDL_Log("Right Trigger");
 
 	// Sticks
-	if (cs->click_left)
-	{
-		SDL_Log("Left Stick Click");
-	}
-	if (cs->click_right)
-	{
-		SDL_Log("Right Stick Click");
-	}
+	if (cs->click_left) SDL_Log("Left Stick Click");
+	if (cs->click_right) SDL_Log("Right Stick Click");
 
 	// System
-	if (cs->button_start)
-	{
-		SDL_Log("Start Button");
-	}
-	if (cs->button_select)
-	{
-		SDL_Log("Select Button");
-	}
+	if (cs->button_start) SDL_Log("Start Button");
+	if (cs->button_select) SDL_Log("Select Button");
 
 	// Analog Axes
-	SDL_Log("Axis Left X Value: %i", cs->axis_lx);
-	SDL_Log("Axis Left Y Value: %i", cs->axis_ly);
-	SDL_Log("Axis Right X Value: %i", cs->axis_rx);
-	SDL_Log("Axis Right Y Value: %i", cs->axis_ry);
+	if (SDL_abs(cs->axis_lx) > AXIS_DEADZONE) SDL_Log("Axis Left X Value: %i", cs->axis_lx);
+	if (SDL_abs(cs->axis_ly) > AXIS_DEADZONE) SDL_Log("Axis Left Y Value: %i", cs->axis_ly);
+	if (SDL_abs(cs->axis_rx) > AXIS_DEADZONE) SDL_Log("Axis Right X Value: %i", cs->axis_rx);
+	if (SDL_abs(cs->axis_ry) > AXIS_DEADZONE) SDL_Log("Axis Right Y Value: %i", cs->axis_ry);
 
 	// Keyboard
 	KeyboardState* ks = as->keyboard_state;
