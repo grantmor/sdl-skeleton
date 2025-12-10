@@ -24,7 +24,6 @@ void build_audio_list(AppState* as)
 
 void update_time(Time* time)
 {
-	//Time* time = as->time;
     u64 pc = SDL_GetPerformanceCounter();
     u64 freq = SDL_GetPerformanceFrequency();
     time->cur_time = (f64)pc / (f64)freq;
@@ -38,7 +37,8 @@ void update_time(Time* time)
     if (time->frame_counter % 2000 == 0)
         SDL_Log("FPS: %0.0f", time->fps_avg);
 
-    // Update last time for next frame
+    // Update time for next frames 
+    time->dt = time->cur_time - time->last_time;
     time->last_time = time->cur_time;
     time->frame_counter++;
 }
@@ -52,6 +52,5 @@ void game_step(AppState* as)
     game_update(as);
     build_render_list(as);
     build_audio_list(as);
-
 }
 

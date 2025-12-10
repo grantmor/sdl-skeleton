@@ -7,6 +7,8 @@
 #include "platform_event.c"
 #include "platform_quit.c"
 
+//FIXME: Swap out (most) SDL_Log()s for SDL_LogDebug()s
+
 SDL_AppResult SDL_AppInit(void** appstate, int argc, char *argv[])
 {
 	return platform_init(appstate);
