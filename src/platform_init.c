@@ -8,6 +8,7 @@
 #include <SDL3/SDL_timer.h>
 
 #include "types.h"
+#include "platform_sdl.h"
 
 SDL_AppResult platform_init(void** appstate)
 {
@@ -38,7 +39,7 @@ SDL_AppResult platform_init(void** appstate)
 
 	// Input
 	i32 num_gamepads; 
-	SDL_JoystickID *ids =SDL_GetGamepads(&num_gamepads);
+	SDL_JoystickID *ids = SDL_GetGamepads(&num_gamepads);
 
 	// Handle multiple controllers later
 	if (num_gamepads > 0)
@@ -52,11 +53,14 @@ SDL_AppResult platform_init(void** appstate)
 		{
 			SDL_Log("Gamepad Name: %s\n", SDL_GetGamepadName(controller));
 			as->sdl_gamepad = controller;
-			ControllerState* cs = SDL_malloc(sizeof(ControllerState));
+			ControllerState* cs = SDL_calloc(1, sizeof(ControllerState));
 			as->controller_state = cs;
 		}
 
 	}
+
+	KeyboardState* ks = (KeyboardState*) SDL_calloc(1, sizeof(KeyboardState));
+	as->keyboard_state = ks;
 
 	*appstate = as;
 

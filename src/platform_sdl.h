@@ -3,6 +3,16 @@
 #include <SDL3/SDL.h>
 #include "types.h"
 
+typedef enum {
+	NEGATIVE,
+	POSITIVE
+} Sign;
+
+/*
+	FIXME: ControllerState and KeyboardState
+	should probably be a game header, not a platform header
+*/
+
 typedef struct {
 	i16 axis_lx;
 	i16 axis_ly;
@@ -36,6 +46,60 @@ typedef struct {
 } ControllerState;
 
 typedef struct {
+	u8 KEY_0;
+	u8 KEY_1;
+	u8 KEY_2;
+	u8 KEY_3;
+	u8 KEY_4;
+	u8 KEY_5;
+	u8 KEY_6;
+	u8 KEY_7;
+	u8 KEY_8;
+	u8 KEY_9;
+	u8 KEY_A;
+	u8 KEY_B;
+	u8 KEY_C;
+	u8 KEY_D;
+	u8 KEY_E;
+	u8 KEY_F;
+	u8 KEY_G;
+	u8 KEY_H;
+	u8 KEY_I;
+	u8 KEY_J;
+	u8 KEY_K;
+	u8 KEY_L;
+	u8 KEY_M;
+	u8 KEY_N;
+	u8 KEY_O;
+	u8 KEY_P;
+	u8 KEY_Q;
+	u8 KEY_R;
+	u8 KEY_S;
+	u8 KEY_T;
+	u8 KEY_U;
+	u8 KEY_V;
+	u8 KEY_W;
+	u8 KEY_X;
+	u8 KEY_Y;
+	u8 KEY_Z;
+
+	u8 KEY_MINUS;          
+	u8 KEY_EQUALS;         
+	u8 KEY_LEFTBRACKET;    
+	u8 KEY_RIGHTBRACKET;   
+	u8 KEY_BACKSLASH;      
+	u8 KEY_SEMICOLON;      
+	u8 KEY_APOSTROPHE;     
+	u8 KEY_GRAVE;          
+	u8 KEY_COMMA;          
+	u8 KEY_PERIOD;         
+	u8 KEY_SLASH;          
+
+	u8 KEY_SPACE;
+	u8 KEY_TAB;
+} KeyboardState;
+
+typedef struct {
 	SDL_Window* window;
 	SDL_Renderer* renderer;
 	u64 last_time;
@@ -43,4 +107,5 @@ typedef struct {
 	//Input
 	SDL_Gamepad* sdl_gamepad;
 	ControllerState* controller_state;
+	KeyboardState* keyboard_state;
 } AppState;
