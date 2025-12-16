@@ -2,6 +2,7 @@
 
 #include <SDL3/SDL_gamepad.h>
 #include <SDL3/SDL_keyboard.h>
+#include <SDL3/SDL_mouse.h>
 #include <SDL3/SDL_stdinc.h>
 
 #include "types.h"
@@ -26,6 +27,9 @@ bool is_axis_pressed(SDL_Gamepad* gp, SDL_GamepadAxis axis, Sign sign, i16 thres
 
 void platform_input(AppState* as)
 {
+
+	// FIXME: Segfaults when gamepad not connected
+
 	// Gamepad
 	ControllerState* cs = as->controller_state;
 	SDL_Gamepad* gp = as->sdl_gamepad;
@@ -110,6 +114,20 @@ void platform_input(AppState* as)
 	ks->KEY_SLASH = sdl_state[SDL_SCANCODE_SLASH];
 	ks->KEY_SPACE = sdl_state[SDL_SCANCODE_SPACE];
 	ks->KEY_TAB = sdl_state[SDL_SCANCODE_TAB];
+
+	// Mouse
+	MouseState* ms = as->mouse_state;
+
+	SDL_MouseButtonFlags mouse_flags = SDL_GetMouseState(&ms->pos_x, &ms->pos_y);
+	SDL_MouseButtonFlags relative_mouse_flags = SDL_GetRelativeMouseState(&ms->rel_x, &ms->rel_y);
+
+
+	ms->click_left = mouse_flags | SDL_BUTTON_LEFT;
+	ms->click_right = mouse_flags | SDL_BUTTON_RIGHT;
+	ms->click_middle = mouse_flags | SDL_BUTTON_MIDDLE;
+	ms->side_1 = mouse_flags | SDL_BUTTON_X1;
+	ms->side_2 = mouse_flags | SDL_BUTTON_X2;
+
 }
 
 void game_input(AppState* as)
@@ -200,4 +218,19 @@ void game_input(AppState* as)
 	if (ks->KEY_SLASH) SDL_Log("SLASH key pressed");
 	if (ks->KEY_SPACE) SDL_Log("SPACE key pressed");
 	if (ks->KEY_TAB) SDL_Log("TAB key pressed");
+
+	// Mouse
+	MouseState* ms = as->mouse_state;
+
+	SDL_Log("Axis Right X Value: %f", ms->pos_x);
+	SDL_Log("Axis Right Y Value: %f", ms->pos_y);
+
+	SDL_Log("Axis Right X Relative Value: %f", ms->rel_x);
+	SDL_Log("Axis Right Y Relative Value: %f", ms->rel_y);
+
+	if (ms->click_left) SDL_Log("Left Click");
+	if (ms->click_right) SDL_Log("Right Click");
+	if (ms->click_middle) SDL_Log("Middle Click");
+	if (ms->side_1) SDL_Log("Side Button 1");
+	if (ms->side_2) SDL_Log("Side Button 2");
 }

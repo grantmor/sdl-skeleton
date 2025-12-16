@@ -38,7 +38,7 @@ void update_time(Time* time)
         SDL_Log("FPS: %0.0f", time->fps_avg);
 
     // Update time for next frames 
-    time->dt = time->cur_time - time->last_time;
+    time->dt = frametime;
     time->last_time = time->cur_time;
     time->frame_counter++;
 }

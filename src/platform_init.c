@@ -62,6 +62,9 @@ SDL_AppResult platform_init(void** appstate)
 	KeyboardState* ks = (KeyboardState*) SDL_calloc(1, sizeof(KeyboardState));
 	as->keyboard_state = ks;
 
+	MouseState* ms = (MouseState*) SDL_calloc(1, sizeof(MouseState));
+	as->mouse_state = ms;
+
 	// Time
 	Time* time = (Time*) SDL_calloc(1, sizeof(Time));
 	time->last_time = (f64)SDL_GetPerformanceCounter() / (f64) SDL_GetPerformanceFrequency();

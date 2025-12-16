@@ -100,6 +100,20 @@ typedef struct {
 } KeyboardState;
 
 typedef struct {
+	f32 pos_x;
+	f32 rel_x;
+	f32 pos_y;
+	f32 rel_y;
+	u8 click_left;
+	u8 click_right;
+	u8 click_middle;
+	u8 side_1;
+	u8 side_2;
+	u8 wheel_up;
+	u8 wheel_down;
+} MouseState;
+
+typedef struct {
 	f64 last_time;
 	f64 cur_time;
 	f64 dt;
@@ -117,4 +131,5 @@ typedef struct {
 	SDL_Gamepad* sdl_gamepad;
 	ControllerState* controller_state;
 	KeyboardState* keyboard_state;
+	MouseState* mouse_state;
 } AppState;
