@@ -132,6 +132,7 @@ void platform_input(AppState* as)
 
 void game_input(AppState* as)
 {
+	/*
 	ControllerState* cs = as->controller_state;	
 
 	// Face Buttons
@@ -233,4 +234,5 @@ void game_input(AppState* as)
 	if (ms->click_middle) SDL_Log("Middle Click");
 	if (ms->side_1) SDL_Log("Side Button 1");
 	if (ms->side_2) SDL_Log("Side Button 2");
+	*/
 }

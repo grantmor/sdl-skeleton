@@ -3,6 +3,8 @@
 #include <SDL3/SDL.h>
 #include "types.h"
 
+#include "audio.c"
+
 typedef enum {
 	NEGATIVE,
 	POSITIVE
@@ -132,4 +134,11 @@ typedef struct {
 	ControllerState* controller_state;
 	KeyboardState* keyboard_state;
 	MouseState* mouse_state;
+	// SDL_AudioStream* sdl_audio_stream;
+	SoundManager* sound_manager;
+
+	// Resources
+	// TODO: This obviously shouldn't be naked in global state
+	SoundClip* sound_clip;
+	
 } AppState;

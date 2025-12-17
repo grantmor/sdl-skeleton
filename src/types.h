@@ -18,4 +18,6 @@ typedef Sint64 i64;
 typedef float f32;
 typedef double f64;
 
+typedef bool b8;
+
 typedef size_t usize;
