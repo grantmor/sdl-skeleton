@@ -120,11 +120,11 @@ SDL_AppResult platform_init(void** appstate)
 	// Initialize Audio
 	SDL_AudioDeviceID device = SDL_OpenAudioDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &system_spec);
 
-	for (usize s; s<NUM_SFX_CHANNELS; s++)
+	for (usize s=0; s<NUM_SFX_CHANNELS; s++)
 	{
 		SDL_AudioStream* stream = SDL_CreateAudioStream(&sample_spec, &system_spec);
 		SDL_BindAudioStream(device, stream);
-		SDL_ResumeAudioStreamDevice(stream);
+		//SDL_ResumeAudioDevice(device);
 
 		as->sound_manager->stream_pool[s] = stream;
 

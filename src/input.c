@@ -212,6 +212,7 @@ void platform_input(AppState* as)
 
 void game_input(AppState* as)
 {
+	/*
 	ControllerState* cs = &as->game_input->controller_state;
 
 	// Face Buttons
@@ -333,4 +334,5 @@ void game_input(AppState* as)
 			if (b == MOUSE_BUTTON_SIDE_2) SDL_Log("Mouse Side 2 Button Held");
 		}
 	}
+	*/
 }
