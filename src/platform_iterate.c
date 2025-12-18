@@ -24,6 +24,8 @@ void play_sound_clip(SoundManager* sound_man, SoundClip* clip)
 		mask |= ((u64) 1 << c);
 		if ((*active_flags & mask) == 0)
 		{
+			// FIXME: This needs to be cleared when sounds are not playing! This is not done anywhere yet!!!
+			// active_flags might not even be necessary, maybe can just check for a channel with no data in the buffer?
 			SDL_PutAudioStreamData(sound_man->stream_pool[c], clip->data, clip->length);
 			*active_flags = *active_flags & mask;
 			break;
@@ -33,6 +35,7 @@ void play_sound_clip(SoundManager* sound_man, SoundClip* clip)
 
 void platform_audio(AppState* as)
 {
+/*
 
 	// Test Audio
 	// SDL_AudioStream* stream = as->sdl_audio_stream;
@@ -47,6 +50,7 @@ void platform_audio(AppState* as)
 		//SDL_PutAudioStreamData(stream, sound_clip->data, sound_clip->length);
 		play_sound_clip(sound_man, sound_clip);
 	}
+*/
 }
 
 

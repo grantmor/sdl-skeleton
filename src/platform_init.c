@@ -43,6 +43,11 @@ SDL_AppResult platform_init(void** appstate)
 	SDL_SetRenderLogicalPresentation(as->renderer, 320, 180, SDL_LOGICAL_PRESENTATION_LETTERBOX);
 
 	// Input
+	PlatformInput* pi = (PlatformInput*) SDL_calloc(1, sizeof(PlatformInput));
+	as->platform_input = pi;
+	GameInput* gi = (GameInput*) SDL_calloc(1, sizeof(GameInput));
+	as->game_input = gi;
+
 	i32 num_gamepads; 
 	SDL_JoystickID *ids = SDL_GetGamepads(&num_gamepads);
 
@@ -57,18 +62,18 @@ SDL_AppResult platform_init(void** appstate)
 		else
 		{
 			SDL_Log("Gamepad Name: %s\n", SDL_GetGamepadName(controller));
-			as->sdl_gamepad = controller;
-			ControllerState* cs = SDL_calloc(1, sizeof(ControllerState));
-			as->controller_state = cs;
+			pi->platform_gamepad = controller;
 		}
-
 	}
 
+/*
 	KeyboardState* ks = (KeyboardState*) SDL_calloc(1, sizeof(KeyboardState));
 	as->keyboard_state = ks;
 
 	MouseState* ms = (MouseState*) SDL_calloc(1, sizeof(MouseState));
 	as->mouse_state = ms;
+*/
+
 
 	// Time
 	Time* time = (Time*) SDL_calloc(1, sizeof(Time));
