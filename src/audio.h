@@ -1,7 +1,7 @@
 #pragma once
 
-#include "types.h"
 #include <SDL3/SDL_audio.h>
+#include "types.h"
 
 #define NUM_SFX_CHANNELS 64
 
@@ -14,4 +14,10 @@ typedef struct {
 
 typedef struct {
 	SDL_AudioStream* stream_pool[NUM_SFX_CHANNELS];
+	SDL_AudioDeviceID device_id;
 } SoundManager;
+
+void play_sound_clip(SoundManager* sound_man, SoundClip* clip);
+
+void update_active_channels(SoundManager* sound_man);
+

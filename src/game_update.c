@@ -45,15 +45,12 @@ void update_time(Time* time)
 
 void game_step(AppState* as)
 {
-    // SDL_Log("Begin step");
     update_time(as->time);
 
     platform_input(as);    
-    // SDL_Log("step");
     game_input(as);
     game_update(as);
     build_render_list(as);
     build_audio_list(as);
-    // SDL_Log("end of step");
 }
 

@@ -2,7 +2,9 @@
 
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_audio.h>
+#include <SDL3/SDL_error.h>
 #include <SDL3/SDL_init.h>
+#include <SDL3/SDL_oldnames.h>
 
 #include "audio.c"
 #include "game_update.c"
@@ -17,18 +19,17 @@ void platform_render(AppState* as)
 
 void play_sound_clip(SoundManager* sound_man, SoundClip* clip)
 {
-	u64* active_flags = &sound_man->active_flags;
-
 	for (u64 c=0; c<NUM_SFX_CHANNELS; c++)	
 	{
-		u64 mask = 0;
-		mask |= ((u64) 1 << c);
-		if ((*active_flags & mask) == 0)
+		u64 queued = SDL_GetAudioStreamQueued(sound_man->stream_pool[c]);
+
+		if (queued == 0)
 		{
-			// FIXME: This needs to be cleared when sounds are not playing! This is not done anywhere yet!!!
-			// active_flags might not even be necessary, maybe can just check for a channel with no data in the buffer?
-			SDL_PutAudioStreamData(sound_man->stream_pool[c], clip->data, clip->length);
-			*active_flags |= mask;
+			if (SDL_PutAudioStreamData(sound_man->stream_pool[c], clip->data, clip->length))
+			{
+				//SDL_Log("Error! Failed to put audio samples in channel %llu", c);
+				SDL_FlushAudioStream(sound_man->stream_pool[c]);
+			}
 			break;
 		}
 	}

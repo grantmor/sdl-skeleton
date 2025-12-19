@@ -87,7 +87,6 @@ SDL_AppResult platform_init(void** appstate)
 	// Audio
 	SoundManager* sound_manager = SDL_calloc(1, sizeof(SoundManager));
 	as->sound_manager = sound_manager;
-	as->sound_manager->active_flags = 0;
 
 	// Load WAV
 	SoundClip* sound = (SoundClip*) SDL_calloc(1, sizeof(SoundClip));
@@ -124,7 +123,6 @@ SDL_AppResult platform_init(void** appstate)
 	{
 		SDL_AudioStream* stream = SDL_CreateAudioStream(&sample_spec, &system_spec);
 		SDL_BindAudioStream(device, stream);
-		//SDL_ResumeAudioDevice(device);
 
 		as->sound_manager->stream_pool[s] = stream;
 
@@ -134,6 +132,8 @@ SDL_AppResult platform_init(void** appstate)
 			//TODO: Crash here?
 		}
 	}
+	//SDL_Log("Audio device status before resuming device: %s", SDL_GetAudio)
+	SDL_ResumeAudioDevice(device);
 
 	as->time = time;
 	
