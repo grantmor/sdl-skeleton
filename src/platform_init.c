@@ -66,15 +66,6 @@ SDL_AppResult platform_init(void** appstate)
 		}
 	}
 
-/*
-	KeyboardState* ks = (KeyboardState*) SDL_calloc(1, sizeof(KeyboardState));
-	as->keyboard_state = ks;
-
-	MouseState* ms = (MouseState*) SDL_calloc(1, sizeof(MouseState));
-	as->mouse_state = ms;
-*/
-
-
 	// Time
 	Time* time = (Time*) SDL_calloc(1, sizeof(Time));
 	time->last_time = (f64)SDL_GetPerformanceCounter() / (f64) SDL_GetPerformanceFrequency();
@@ -82,7 +73,6 @@ SDL_AppResult platform_init(void** appstate)
 	time->cur_time = 0;
 	time->dt = 0;
 	time->fps_avg = 0;
-
 
 	// Audio
 	SoundManager* sound_manager = SDL_calloc(1, sizeof(SoundManager));
@@ -132,7 +122,6 @@ SDL_AppResult platform_init(void** appstate)
 			//TODO: Crash here?
 		}
 	}
-	//SDL_Log("Audio device status before resuming device: %s", SDL_GetAudio)
 	SDL_ResumeAudioDevice(device);
 
 	as->time = time;

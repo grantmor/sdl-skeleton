@@ -5,6 +5,8 @@
 #include <SDL3/SDL_error.h>
 #include <SDL3/SDL_init.h>
 #include <SDL3/SDL_oldnames.h>
+#include <SDL3/SDL_rect.h>
+#include <SDL3/SDL_render.h>
 
 #include "audio.c"
 #include "game_update.c"
@@ -12,8 +14,16 @@
 
 void platform_render(AppState* as)
 {
-	SDL_SetRenderDrawColorFloat(as->renderer, 0.0,0.0,1.0,1.0);
-	SDL_RenderClear(as->renderer);
+	SDL_Renderer* renderer = as->renderer;
+
+	SDL_SetRenderDrawColorFloat(renderer, 0.0,0.0,0.0,1.0);
+	SDL_RenderClear(renderer);
+
+	// Just here to visualize screen area and letterboxing
+	SDL_SetRenderDrawColor(renderer, 0.0, 0.0, 255, 1.0);
+	SDL_FRect rect = (SDL_FRect) {0.0,0.0,320.0,180.0};
+	SDL_RenderFillRect(renderer, &rect);
+	
 	SDL_RenderPresent(as->renderer);
 }
 
@@ -44,7 +54,6 @@ void platform_audio(AppState* as)
 	//SDL_Log("bytes queued: %i", SDL_GetAudioStreamQueued(stream));
 	if (as->game_input->keyboard_state.key[KEY_SPACE] == BUTTON_PRESSED)
 	{
-		SDL_Log("space");
 		play_sound_clip(sound_man, sound_clip);
 	}
 }
