@@ -1,6 +1,13 @@
 # Project Specific
-game
 res/*
+todo.txt
+ext/*
+inc/*
+lib/*
+
+# built objects
+index*
+game
 
 # Prerequisites
 *.d

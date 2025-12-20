@@ -3,7 +3,7 @@
 #include "types.h"
 #include <SDL3/SDL_audio.h>
 
-#define NUM_SFX_CHANNELS 64
+#define NUM_SFX_CHANNELS 16
 
 typedef struct {
 	u32 id;
