@@ -6,6 +6,8 @@
 #include "audio.c"
 #include "input.h"
 
+#include "super_lib.c"
+
 typedef struct {
 	f64 last_time;
 	f64 cur_time;
