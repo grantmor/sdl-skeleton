@@ -38,12 +38,6 @@ void platform_gamepad_button_state
 	b8 prev_button_state = state_prev->button[button];
 	b8 button_state = SDL_GetGamepadButton(gp, button);
 
-	if (button == BUTTON_NORTH)
-	{
-		SDL_Log("prev_button_state: %d", prev_button_state);
-		SDL_Log("button_state: %d", prev_button_state);
-	}
-
 	if (button_state && prev_button_state)
 	{
 		cs->button[button] = BUTTON_HELD;
@@ -211,7 +205,6 @@ void platform_input(
 	platform_gamepad_button_state_analog(gp, SHOULDER_LEFT, POSITIVE, pcs, cs);
 	platform_gamepad_button_state_analog(gp, SHOULDER_RIGHT, POSITIVE, pcs, cs);
 */
-
 
 	// Mouse and Keyboard
 	platform_key_state(&platform_input->keyboard_prev, &game_input->keyboard_state);
