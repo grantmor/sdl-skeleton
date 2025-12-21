@@ -11,6 +11,7 @@
 #include "audio.c"
 #include "game_update.c"
 #include "input.h"
+#include "platform_sdl.h"
 
 void platform_render(AppState* as)
 {
@@ -45,16 +46,17 @@ void play_sound_clip(SoundManager* sound_man, SoundClip* clip)
 	}
 }
 
-void platform_audio(AppState* as)
+// void platform_audio(AppState* as)
+void platform_audio(SoundManager* sound_manager, SoundClip* sound_clip, GameInput* game_input)
 {
 	// Test Audio
-	SoundManager* sound_man = as->sound_manager;
-	SoundClip* sound_clip = as->sound_clip;
+	// SoundManager* sound_man = as->sound_manager;
+	// SoundClip* sound_clip = as->sound_clip;
 
 	//SDL_Log("bytes queued: %i", SDL_GetAudioStreamQueued(stream));
-	if (as->game_input->keyboard_state.key[KEY_SPACE] == BUTTON_PRESSED)
+	if (game_input->keyboard_state.key[KEY_SPACE] == BUTTON_PRESSED)
 	{
-		play_sound_clip(sound_man, sound_clip);
+		play_sound_clip(sound_manager, sound_clip);
 	}
 }
 
@@ -63,7 +65,8 @@ SDL_AppResult platform_iterate(AppState* as)
 {
 	game_step(as);
 	platform_render(as);
-	platform_audio(as);
+	platform_audio(&as->sound_manager, as->sound_clip, &as->game_input);
 
 	return SDL_APP_CONTINUE;
 }
+

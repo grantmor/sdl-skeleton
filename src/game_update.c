@@ -43,13 +43,33 @@ void update_time(Time* time)
     time->frame_counter++;
 }
 
+// TODO: This needs to be made more robust later
+void platform_update_gamepads(AppState* as) {
+    SDL_PumpEvents();
+    SDL_UpdateGamepads();
+
+    i32 num_gamepads;
+    SDL_JoystickID* ids = SDL_GetGamepads(&num_gamepads);
+
+    if (num_gamepads > 0 && as->platform_input.platform_gamepad == NULL) {
+        SDL_Gamepad* controller = SDL_OpenGamepad(ids[0]);
+        if (controller) {
+            SDL_Log("Opened gamepad: %s", SDL_GetGamepadName(controller));
+            as->platform_input.platform_gamepad = controller;
+        }
+    }
+}
+
 void game_step(AppState* as)
 {
-    update_time(as->time);
+    update_time(&as->time);
 
-    platform_input(as);    
-    game_input(as);
+	platform_update_gamepads(as);
+    platform_input(&as->platform_input, &as->game_input);    
+    game_input(&as->platform_input, &as->game_input);
+
     game_update(as);
+
     build_render_list(as);
     build_audio_list(as);
 }

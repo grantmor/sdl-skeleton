@@ -2,6 +2,7 @@
 
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_audio.h>
+#include <SDL3/SDL_events.h>
 #include <SDL3/SDL_filesystem.h>
 #include <SDL3/SDL_gamepad.h>
 #include <SDL3/SDL_init.h>
@@ -18,7 +19,6 @@
 SDL_AppResult platform_init(void** appstate)
 {
 	SDL_SetAppMetadata("SDL3 Skeleton", "0.1", "sgz");
-
 	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD | SDL_INIT_AUDIO);
 
 	/*
@@ -42,15 +42,12 @@ SDL_AppResult platform_init(void** appstate)
 
 	SDL_SetRenderLogicalPresentation(as->renderer, 320, 180, SDL_LOGICAL_PRESENTATION_LETTERBOX);
 
-	// Input
-	PlatformInput* pi = (PlatformInput*) SDL_calloc(1, sizeof(PlatformInput));
-	as->platform_input = pi;
-	GameInput* gi = (GameInput*) SDL_calloc(1, sizeof(GameInput));
-	as->game_input = gi;
-
+	// Pump events to ensure gamepad can be accessed
+	SDL_PumpEvents();
+	SDL_UpdateGamepads();
 	i32 num_gamepads; 
 	SDL_JoystickID *ids = SDL_GetGamepads(&num_gamepads);
-
+	
 	// Handle multiple controllers later
 	if (num_gamepads > 0)
 	{
@@ -62,20 +59,22 @@ SDL_AppResult platform_init(void** appstate)
 		else
 		{
 			SDL_Log("Gamepad Name: %s\n", SDL_GetGamepadName(controller));
-			pi->platform_gamepad = controller;
+			as->platform_input.platform_gamepad = controller;
 		}
 	}
 
 	// Time
-	Time* time = (Time*) SDL_calloc(1, sizeof(Time));
-	time->last_time = (f64)SDL_GetPerformanceCounter() / (f64) SDL_GetPerformanceFrequency();
-	time->frame_counter = 0;
-	time->cur_time = 0;
-	time->dt = 0;
-	time->fps_avg = 0;
+	Time time = {
+		.last_time = (f64)SDL_GetPerformanceCounter() / (f64) SDL_GetPerformanceFrequency(),
+		.frame_counter = 0,
+		.cur_time = 0,
+		.dt = 0,
+		.fps_avg = 0
+	};
+	as->time = time;
 
 	// Audio
-	SoundManager* sound_manager = SDL_calloc(1, sizeof(SoundManager));
+	SoundManager sound_manager = {0};
 	as->sound_manager = sound_manager;
 
 	// Load WAV
@@ -114,7 +113,7 @@ SDL_AppResult platform_init(void** appstate)
 		SDL_AudioStream* stream = SDL_CreateAudioStream(&sample_spec, &system_spec);
 		SDL_BindAudioStream(device, stream);
 
-		as->sound_manager->stream_pool[s] = stream;
+		as->sound_manager.stream_pool[s] = stream;
 
 		if (!stream)
 		{
@@ -124,8 +123,6 @@ SDL_AppResult platform_init(void** appstate)
 	}
 	SDL_ResumeAudioDevice(device);
 
-	as->time = time;
-	
 	*appstate = as;
 
 	return SDL_APP_CONTINUE;

@@ -36,14 +36,14 @@ typedef struct {
 	SDL_Window* window;
 	SDL_Renderer* renderer;
 
-	Time* time;
+	Time time;
 
 	// Input
-	PlatformInput* platform_input;
-	GameInput* game_input;
+	PlatformInput platform_input;
+	GameInput game_input;
 
 	// Sound
-	SoundManager* sound_manager;
+	SoundManager sound_manager;
 
 	// Resources
 	// TODO: This obviously shouldn't be naked in global state

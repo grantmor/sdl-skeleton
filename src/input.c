@@ -38,6 +38,12 @@ void platform_gamepad_button_state
 	b8 prev_button_state = state_prev->button[button];
 	b8 button_state = SDL_GetGamepadButton(gp, button);
 
+	if (button == BUTTON_NORTH)
+	{
+		SDL_Log("prev_button_state: %d", prev_button_state);
+		SDL_Log("button_state: %d", prev_button_state);
+	}
+
 	if (button_state && prev_button_state)
 	{
 		cs->button[button] = BUTTON_HELD;
@@ -164,15 +170,17 @@ void platform_mouse_state(PlatformMouseState* pms, MouseState* ms)
     pms->rel_y = ms->rel_y;
 }
 
-void platform_input(AppState* as)
+void platform_input(
+	PlatformInput* platform_input,
+	GameInput* game_input
+)
 {
-
 	// FIXME: Segfaults when gamepad not connected
 
 	// Gamepad
-	SDL_Gamepad* gp = as->platform_input->platform_gamepad;
-	PlatformControllerState* pcs = &as->platform_input->gamepad_state_prev;
-	ControllerState* cs = &as->game_input->controller_state;
+	SDL_Gamepad* gp = platform_input->platform_gamepad;
+	PlatformControllerState* pcs = &platform_input->gamepad_state_prev;
+	ControllerState* cs = &game_input->controller_state;
 
 	// Set current state
 	platform_gamepad_button_state(gp, SDL_GAMEPAD_BUTTON_DPAD_UP, pcs, cs);
@@ -206,14 +214,13 @@ void platform_input(AppState* as)
 
 
 	// Mouse and Keyboard
-	platform_key_state(&as->platform_input->keyboard_prev, &as->game_input->keyboard_state);
-	platform_mouse_state(&as->platform_input->mouse_state_prev, &as->game_input->mouse_state);
+	platform_key_state(&platform_input->keyboard_prev, &game_input->keyboard_state);
+	platform_mouse_state(&platform_input->mouse_state_prev, &game_input->mouse_state);
 }
 
-void game_input(AppState* as)
+void game_input(PlatformInput* platform_input, GameInput* game_input) 
 {
-	/*
-	ControllerState* cs = &as->game_input->controller_state;
+	ControllerState* cs = &game_input->controller_state;
 
 	// Face Buttons
 	if (cs->button[BUTTON_NORTH] == BUTTON_HELD) SDL_Log("North Button held");
@@ -243,8 +250,16 @@ void game_input(AppState* as)
 	if (cs->button[BUTTON_START] == BUTTON_HELD) SDL_Log("Start Button held");
 	if (cs->button[BUTTON_SELECT]  == BUTTON_HELD) SDL_Log("Select Button held");
 
+	// Controller Axes
+	SDL_Log("Axis 0:%i", cs->axis[0]);
+	SDL_Log("Axis 1:%i", cs->axis[1]);
+	SDL_Log("Axis 2:%i", cs->axis[2]);
+	SDL_Log("Axis 3:%i", cs->axis[3]);
+	SDL_Log("Axis 4:%i", cs->axis[4]);
+	SDL_Log("Axis 5:%i", cs->axis[5]);
+
 	// Keyboard
-	KeyboardState* ks = &as->game_input->keyboard_state;
+	KeyboardState* ks = &game_input->keyboard_state;
 
 	if (ks->key[KEY_0] == BUTTON_HELD) SDL_Log("0 key held");
 	if (ks->key[KEY_1] == BUTTON_HELD) SDL_Log("1 key held");
@@ -312,10 +327,10 @@ void game_input(AppState* as)
 	if (ks->key[KEY_F10] == BUTTON_HELD) SDL_Log("F10 key held");
 	if (ks->key[KEY_F11] == BUTTON_HELD) SDL_Log("F11 key held");
 	if (ks->key[KEY_F12] == BUTTON_HELD) SDL_Log("F12 key held");
-
+/*
 	// Mouse
-	PlatformMouseState* pms = &as->platform_input->mouse_state_prev;
-	MouseState* ms = &as->game_input->mouse_state;
+	PlatformMouseState* pms = &platform_input->mouse_state_prev;
+	MouseState* ms = &game_input->mouse_state;
 
 	SDL_Log("Axis Right X Value: %f", ms->pos_x);
 	SDL_Log("Axis Right Y Value: %f", ms->pos_y);
