@@ -43,6 +43,15 @@ typedef enum {
 	BUTTON_SELECT = 4
 } ControllerMap;
 
+typedef enum {
+	AXIS_LEFTX = 0,
+	AXIS_LEFTY = 1,
+	AXIS_RIGHTX = 2,
+	AXIS_RIGHTY = 3,
+	AXIS_TRIGGER_L = 4,
+	AXIS_TRIGGER_R = 5
+} ControllerAxisMap;
+
 typedef struct {
 	ButtonState button[18];
 	i16 axis[6];

@@ -21,3 +21,8 @@ typedef double f64;
 typedef bool b8;
 
 typedef size_t usize;
+
+typedef struct {
+	f32 x;
+	f64 y;
+} FVec2;

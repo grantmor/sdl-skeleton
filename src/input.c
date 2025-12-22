@@ -12,6 +12,7 @@
 #include "input.h"
 
 
+
 //TODO: Add features of mapping keys and gamepad controls to "Actions"
 
 
@@ -164,6 +165,25 @@ void platform_mouse_state(PlatformMouseState* pms, MouseState* ms)
     pms->rel_y = ms->rel_y;
 }
 
+void platform_gamepad_axis_state
+(
+	SDL_Gamepad* gp,
+	SDL_GamepadAxis axis,
+	PlatformControllerState* state_prev,
+	ControllerState* cs
+)
+{
+	i32 value = SDL_GetGamepadAxis(gp, axis);
+	i8 sign = (value > 0) - (value < 0);
+	i32 magnitude = SDL_min(SDL_abs(value), SDL_MAX_SINT16);
+	i16 clamped = (i16) (magnitude * sign);
+	//state_prev->axis[]		
+
+	// TODO: Calculate and store relative later?
+	state_prev->axis[axis] = cs->axis[axis];
+	cs->axis[axis] = clamped; 
+}
+
 void platform_input(
 	PlatformInput* platform_input,
 	GameInput* game_input
@@ -199,7 +219,17 @@ void platform_input(
 	platform_gamepad_button_state_analog(gp, TRIGGER_LEFT, POSITIVE, pcs, cs);
 	platform_gamepad_button_state_analog(gp, TRIGGER_RIGHT, POSITIVE, pcs, cs);
 
-/* TODO: Sticks as buttons
+	// Analog Axis Values
+	platform_gamepad_axis_state(gp, SDL_GAMEPAD_AXIS_LEFTX, pcs, cs);
+	platform_gamepad_axis_state(gp, SDL_GAMEPAD_AXIS_LEFTY, pcs, cs);
+	platform_gamepad_axis_state(gp, SDL_GAMEPAD_AXIS_RIGHTX, pcs, cs);
+	platform_gamepad_axis_state(gp, SDL_GAMEPAD_AXIS_RIGHTY, pcs, cs);
+
+	platform_gamepad_axis_state(gp, SDL_GAMEPAD_AXIS_LEFT_TRIGGER, pcs, cs);
+	platform_gamepad_axis_state(gp, SDL_GAMEPAD_AXIS_RIGHT_TRIGGER, pcs, cs);
+
+// TODO: Sticks as buttons
+/*
 	platform_gamepad_button_state_analog(gp, SHOULDER_LEFT, POSITIVE, pcs, cs);
 	platform_gamepad_button_state_analog(gp, SHOULDER_RIGHT, POSITIVE, pcs, cs);
 	platform_gamepad_button_state_analog(gp, SHOULDER_LEFT, POSITIVE, pcs, cs);
@@ -213,6 +243,7 @@ void platform_input(
 
 void game_input(PlatformInput* platform_input, GameInput* game_input) 
 {
+	/*
 	ControllerState* cs = &game_input->controller_state;
 
 	// Face Buttons
@@ -320,7 +351,7 @@ void game_input(PlatformInput* platform_input, GameInput* game_input)
 	if (ks->key[KEY_F10] == BUTTON_HELD) SDL_Log("F10 key held");
 	if (ks->key[KEY_F11] == BUTTON_HELD) SDL_Log("F11 key held");
 	if (ks->key[KEY_F12] == BUTTON_HELD) SDL_Log("F12 key held");
-/*
+
 	// Mouse
 	PlatformMouseState* pms = &platform_input->mouse_state_prev;
 	MouseState* ms = &game_input->mouse_state;

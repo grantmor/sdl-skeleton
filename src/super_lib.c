@@ -1,11 +1,13 @@
 #pragma once
 
+#include <SDL3/SDL_filesystem.h>
 #define FREE_VAL 0xFF
 
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_assert.h>
 #include "types.h"
 
+// *** Memory ***
 
 typedef struct {
 	usize capacity;
@@ -43,6 +45,7 @@ u8* arena_alloc(ArenaAllocator* alloc, usize size)
 	else
 	{
 		SDL_Log("Allocator is full!");
+		return NULL;
 	}
 
 	return result;
@@ -63,4 +66,17 @@ ArenaAllocator* arena_reset(ArenaAllocator* arena)
 void arena_free(ArenaAllocator* arena)
 {
 	SDL_free(arena->data);
+}
+
+// *** File IO ***
+i64 file_get_timestamp(char* file)
+{
+	SDL_PathInfo path_info;
+	if (!SDL_GetPathInfo(file, &path_info))
+	{
+	 SDL_Log("Could not get timestamp for file!");	
+	 return -1;
+	}
+
+	return path_info.modify_time;
 }
