@@ -12,13 +12,17 @@
 #include "game_update.c"
 #include "input.h"
 #include "platform_sdl.h"
+#include "super_lib.c"
 
 
 void platform_render(AppState* as)
 {
 	SDL_Renderer* renderer = as->renderer;
 
-	platform_sprite_atlas_load(as->renderer, &as->sprite_atlas);
+	if (file_get_timestamp(as->sprite_atlas.path) > as->sprite_atlas.modified)
+	{
+		platform_sprite_atlas_load(as->renderer, &as->sprite_atlas);
+	}
 
 	SDL_SetRenderDrawColorFloat(renderer, 0.0,0.0,0.0,1.0);
 	SDL_RenderClear(renderer);
