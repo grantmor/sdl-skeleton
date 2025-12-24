@@ -14,14 +14,14 @@
 #include "platform_sdl.h"
 #include "super_lib.c"
 
-
 void platform_render(AppState* as)
 {
 	SDL_Renderer* renderer = as->renderer;
+	SpriteAtlas* sprite_atlas = &as->sprite_atlas;
 
-	if (file_get_timestamp(as->sprite_atlas.path) > as->sprite_atlas.modified)
+	if (file_get_timestamp(sprite_atlas->path) > sprite_atlas->modified)
 	{
-		platform_sprite_atlas_load(as->renderer, &as->sprite_atlas);
+		platform_sprite_atlas_load(renderer, sprite_atlas);
 	}
 
 	SDL_SetRenderDrawColorFloat(renderer, 0.0,0.0,0.0,1.0);
@@ -34,10 +34,10 @@ void platform_render(AppState* as)
 
 	// Layer 1 - Testing Sprite Atlas
 	SDL_FRect sprite_rect = (SDL_FRect) {0.0,0.0,0.0,0.0};
-	SDL_GetTextureSize(as->sprite_atlas.atlas, &sprite_rect.w, &sprite_rect.h);
-	SDL_RenderTexture(as->renderer, as->sprite_atlas.atlas, NULL, &sprite_rect);
+	SDL_GetTextureSize(sprite_atlas->atlas, &sprite_rect.w, &sprite_rect.h);
+	SDL_RenderTexture(renderer, sprite_atlas->atlas, NULL, &sprite_rect);
 
-	SDL_RenderPresent(as->renderer);
+	SDL_RenderPresent(renderer);
 }
 
 void play_sound_clip(SoundManager* sound_man, SoundClip* clip)

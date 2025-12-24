@@ -66,6 +66,7 @@ typedef struct {
 	// TODO: This obviously shouldn't be naked in global state
 	SoundClip* sound_clip;
 } AppState;
+
 void platform_sprite_atlas_load(SDL_Renderer* renderer, SpriteAtlas* atlas)
 {
 	if (atlas->atlas)
