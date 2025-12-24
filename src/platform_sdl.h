@@ -1,6 +1,8 @@
 #pragma once
 
 #include <SDL3/SDL.h>
+#include <SDL3/SDL_render.h>
+#include <SDL3/SDL_surface.h>
 #include "types.h"
 
 #include "audio.c"
@@ -84,5 +86,6 @@ void platform_sprite_atlas_load(SDL_Renderer* renderer, SpriteAtlas* atlas)
 		atlas->atlas = sprite_atlas_tex;
 		atlas->modified = file_get_timestamp(atlas->path);
 		SDL_DestroySurface(sprite_atlas_surf);
+		SDL_SetTextureScaleMode(atlas->atlas, SDL_SCALEMODE_NEAREST);
 	}
 }
