@@ -13,18 +13,26 @@
 #include "input.h"
 #include "platform_sdl.h"
 
+
 void platform_render(AppState* as)
 {
 	SDL_Renderer* renderer = as->renderer;
 
+	platform_sprite_atlas_load(as->renderer, &as->sprite_atlas);
+
 	SDL_SetRenderDrawColorFloat(renderer, 0.0,0.0,0.0,1.0);
 	SDL_RenderClear(renderer);
 
-	// Just here to visualize screen area and letterboxing
-	SDL_SetRenderDrawColor(renderer, 0.0, 0.0, 255, 1.0);
+	// Layer 0 - Just here to visualize screen area and letterboxing
+	SDL_SetRenderDrawColor(renderer, 0.0, 0.0, 255, 255);
 	SDL_FRect rect = (SDL_FRect) {0.0,0.0,320.0,180.0};
 	SDL_RenderFillRect(renderer, &rect);
-	
+
+	// Layer 1 - Testing Sprite Atlas
+	SDL_FRect sprite_rect = (SDL_FRect) {0.0,0.0,0.0,0.0};
+	SDL_GetTextureSize(as->sprite_atlas.atlas, &sprite_rect.w, &sprite_rect.h);
+	SDL_RenderTexture(as->renderer, as->sprite_atlas.atlas, NULL, &sprite_rect);
+
 	SDL_RenderPresent(as->renderer);
 }
 

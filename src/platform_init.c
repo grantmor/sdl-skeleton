@@ -7,7 +7,10 @@
 #include <SDL3/SDL_gamepad.h>
 #include <SDL3/SDL_init.h>
 #include <SDL3/SDL_oldnames.h>
+#include <SDL3/SDL_pixels.h>
+#include <SDL3/SDL_render.h>
 #include <SDL3/SDL_stdinc.h>
+#include <SDL3/SDL_surface.h>
 #include <SDL3/SDL_timer.h>
 #include <wchar.h>
 
@@ -42,6 +45,8 @@ SDL_AppResult platform_init(void** appstate)
 
 	SDL_SetRenderLogicalPresentation(as->renderer, 320, 180, SDL_LOGICAL_PRESENTATION_LETTERBOX);
 
+
+	// Input
 	// Pump events to ensure gamepad can be accessed
 	SDL_PumpEvents();
 	SDL_UpdateGamepads();
@@ -72,6 +77,10 @@ SDL_AppResult platform_init(void** appstate)
 		.fps_avg = 0
 	};
 	as->time = time;
+
+	// Textures
+	as->sprite_atlas.path = "res/image/sprites.bmp";
+	platform_sprite_atlas_load(as->renderer, &as->sprite_atlas);
 
 	// Audio
 	SoundManager sound_manager = {0};
