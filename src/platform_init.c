@@ -112,7 +112,6 @@ SDL_AppResult platform_init(void** appstate)
 	// Audio
 	SoundManager* sound_manager = &as->sound_manager;
 	as->sound_manager.loaded_sounds = 0;
-	// as->sound_manager = sound_manager;
 
 	// Load WAV
 	as->sound_manager.system_spec = (SDL_AudioSpec)
@@ -129,12 +128,6 @@ SDL_AppResult platform_init(void** appstate)
 		.freq = 44100,
 	};
 
-	// TODO: get everything in dir and set path constants
-	// for (usize s=0; s<1; s++) //TODO: number of sounds in dir
-	// {
-		
-
-	// }
 	// Load wavs
 	as->sound_manager.loaded_sounds = 0;
 	char* sound_dir;
