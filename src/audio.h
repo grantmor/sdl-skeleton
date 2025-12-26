@@ -4,6 +4,7 @@
 #include "types.h"
 
 #define NUM_SFX_CHANNELS 64
+#define MAX_SOUNDS 16
 
 typedef struct {
 	u32 id;
@@ -15,6 +16,10 @@ typedef struct {
 typedef struct {
 	SDL_AudioStream* stream_pool[NUM_SFX_CHANNELS];
 	SDL_AudioDeviceID device_id;
+	SoundClip clips[MAX_SOUNDS];
+	SDL_AudioSpec system_spec;
+	SDL_AudioSpec sample_spec;
+	u32 loaded_sounds;
 } SoundManager;
 
 void play_sound_clip(SoundManager* sound_man, SoundClip* clip);

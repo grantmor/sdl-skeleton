@@ -5,7 +5,7 @@
 #include <SDL3/SDL_surface.h>
 #include "types.h"
 
-#include "audio.c"
+#include "audio.h"
 #include "input.h"
 
 #include "super_lib.c"
@@ -42,12 +42,6 @@ typedef struct {
 	u32 height;
 } SpriteAtlas;
 
-/*
-typedef struct {
-	SpriteAtlas sprite_atlas;	
-} ImageManager;
-*/
-
 typedef struct {
 	SDL_Window* window;
 	SDL_Renderer* renderer;
@@ -66,7 +60,7 @@ typedef struct {
 
 	// Resources
 	// TODO: This obviously shouldn't be naked in global state
-	SoundClip* sound_clip;
+	//SoundClip* sound_clip;
 } AppState;
 
 void platform_sprite_atlas_load(SDL_Renderer* renderer, SpriteAtlas* atlas)

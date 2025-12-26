@@ -8,7 +8,6 @@
 #include <SDL3/SDL_rect.h>
 #include <SDL3/SDL_render.h>
 
-#include "audio.c"
 #include "game_update.c"
 #include "input.h"
 #include "platform_sdl.h"
@@ -48,27 +47,33 @@ void play_sound_clip(SoundManager* sound_man, SoundClip* clip)
 
 		if (queued == 0)
 		{
-			if (SDL_PutAudioStreamData(sound_man->stream_pool[c], clip->data, clip->length))
-			{
+			// if (SDL_PutAudioStreamData(sound_man->stream_pool[c], clip->data, clip->length))
+			// {
 				//SDL_Log("Error! Failed to put audio samples in channel %llu", c);
-				SDL_FlushAudioStream(sound_man->stream_pool[c]);
-			}
+			SDL_PutAudioStreamData(sound_man->stream_pool[c], clip->data, clip->length);
+			SDL_FlushAudioStream(sound_man->stream_pool[c]);
+			// }
 			break;
 		}
 	}
 }
 
 // void platform_audio(AppState* as)
-void platform_audio(SoundManager* sound_manager, SoundClip* sound_clip, GameInput* game_input)
+void platform_audio(SoundManager* sound_manager, GameInput* game_input)
 {
 	// Test Audio
-	// SoundManager* sound_man = as->sound_manager;
-	// SoundClip* sound_clip = as->sound_clip;
+	SoundClip* coin_clip = &sound_manager->clips[0];
+	SoundClip* jump_clip = &sound_manager->clips[1];
 
 	//SDL_Log("bytes queued: %i", SDL_GetAudioStreamQueued(stream));
-	if (game_input->keyboard_state.key[KEY_SPACE] == BUTTON_PRESSED)
+	if (game_input->keyboard_state.key[KEY_Q] == BUTTON_PRESSED)
 	{
-		play_sound_clip(sound_manager, sound_clip);
+		play_sound_clip(sound_manager, coin_clip);
+	}
+
+	if (game_input->keyboard_state.key[KEY_W] == BUTTON_PRESSED)
+	{
+		play_sound_clip(sound_manager, jump_clip);
 	}
 }
 
@@ -77,7 +82,7 @@ SDL_AppResult platform_iterate(AppState* as)
 {
 	game_step(as);
 	platform_render(as);
-	platform_audio(&as->sound_manager, as->sound_clip, &as->game_input);
+	platform_audio(&as->sound_manager, &as->game_input);
 
 	return SDL_APP_CONTINUE;
 }

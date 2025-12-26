@@ -14,10 +14,37 @@
 #include <SDL3/SDL_timer.h>
 #include <wchar.h>
 
+#include "audio.h"
 #include "types.h"
 #include "platform_sdl.h"
 
-#include "audio.c"
+static const char RES_DIR[] = "res";
+static const char SFX_DIR[] = "sound";
+
+SDL_EnumerationResult load_wavs(void* userdata, const char* dir, const char* file)
+{
+	SoundManager* sound_manager = (SoundManager*) userdata;
+
+		SoundClip sound = {
+			.path = NULL,
+			.data = NULL,
+			.length = 0
+		};
+
+		SDL_asprintf(&sound.path, "%s%s", dir, file);
+
+		if (!SDL_LoadWAV(sound.path, &sound_manager->sample_spec, &sound.data, &sound.length))
+		{
+			SDL_Log("Couldn't load wav file: %s", SDL_GetError());
+		}
+		// TODO: Log successful load here
+
+		//SDL_free(sound.path);
+		sound_manager->clips[sound_manager->loaded_sounds] = sound;	
+		sound_manager->loaded_sounds++;
+
+		return SDL_ENUM_CONTINUE;
+}
 
 SDL_AppResult platform_init(void** appstate)
 {
@@ -83,43 +110,48 @@ SDL_AppResult platform_init(void** appstate)
 	platform_sprite_atlas_load(as->renderer, &as->sprite_atlas);
 
 	// Audio
-	SoundManager sound_manager = {0};
-	as->sound_manager = sound_manager;
+	SoundManager* sound_manager = &as->sound_manager;
+	as->sound_manager.loaded_sounds = 0;
+	// as->sound_manager = sound_manager;
 
 	// Load WAV
-	SoundClip* sound = (SoundClip*) SDL_calloc(1, sizeof(SoundClip));
-	
-	sound->path = "res/sound";
-	sound->data = NULL;
-	sound->length = 0;
-
-	as->sound_clip = sound;
-
-	SDL_AudioSpec system_spec;
-	system_spec.format = SDL_AUDIO_S16LE;
-	system_spec.channels = 2;
-	system_spec.freq = 48000;
-
-	SDL_AudioSpec sample_spec;
-	sample_spec.format = SDL_AUDIO_S16LE;
-	sample_spec.channels = 1;
-	sample_spec.freq = 44100;
-
-	SDL_asprintf(&sound->path, "%sres/sound/coin.wav", SDL_GetBasePath());
-
-	if (!SDL_LoadWAV(sound->path, &sample_spec, &sound->data, &sound->length))
+	as->sound_manager.system_spec = (SDL_AudioSpec)
 	{
-		SDL_Log("Couldn't load wav file: %s", SDL_GetError());
-	}
+		.format = SDL_AUDIO_S16LE,
+		.channels = 2,
+		.freq = 48000,
+	};
 
-	SDL_free(sound->path);
+	as->sound_manager.sample_spec = (SDL_AudioSpec)
+	{
+		.format = SDL_AUDIO_S16LE,
+		.channels = 1,
+		.freq = 44100,
+	};
+
+	// TODO: get everything in dir and set path constants
+	// for (usize s=0; s<1; s++) //TODO: number of sounds in dir
+	// {
+		
+
+	// }
+	// Load wavs
+	as->sound_manager.loaded_sounds = 0;
+	char* sound_dir;
+	SDL_asprintf(&sound_dir, "%s%s/%s", SDL_GetBasePath(), RES_DIR, SFX_DIR);
+	SDL_EnumerateDirectory(sound_dir, load_wavs, &as->sound_manager);
 
 	// Initialize Audio
-	SDL_AudioDeviceID device = SDL_OpenAudioDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &system_spec);
+	SDL_AudioDeviceID device = SDL_OpenAudioDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &as->sound_manager.system_spec);
+	if (!device)
+	{
+		SDL_Log("Failed to initialize audio device: %s", SDL_GetError());
+	}
+	as->sound_manager.device_id = device;
 
 	for (usize s=0; s<NUM_SFX_CHANNELS; s++)
 	{
-		SDL_AudioStream* stream = SDL_CreateAudioStream(&sample_spec, &system_spec);
+		SDL_AudioStream* stream = SDL_CreateAudioStream(&as->sound_manager.sample_spec, &as->sound_manager.system_spec);
 		SDL_BindAudioStream(device, stream);
 
 		as->sound_manager.stream_pool[s] = stream;
