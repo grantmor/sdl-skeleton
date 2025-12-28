@@ -28,7 +28,7 @@ void add_sound(SoundManager* sound_man, SoundID sound_id)
 void clear_sound_list(SoundManager* sound_man)
 {
     // for (u32 s=sound_man->num_sounds_to_play; s<=0; s--)
-    for (u32 s=sound_man->num_sounds_to_play; s>0; s--)
+    for (i32 s=sound_man->num_sounds_to_play; s>0; s--)
     {
         sound_man->playing_sounds[s] = SFX_NO_SOUND;
     }
