@@ -157,6 +157,13 @@ SDL_AppResult platform_init(void** appstate)
 	}
 	SDL_ResumeAudioDevice(device);
 
+	// init audio playing
+	for (u32 s=0; s<MAX_SOUNDS; s++)
+	{
+		as->sound_manager.playing_sounds[s] = SFX_NO_SOUND;
+	}
+	as->sound_manager.num_sounds_to_play = 0;
+
 	*appstate = as;
 
 	return SDL_APP_CONTINUE;

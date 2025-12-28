@@ -4,6 +4,7 @@
 #include <SDL3/SDL_init.h>
 #include <SDL3/SDL_timer.h>
 
+#include "audio.h"
 #include "platform_sdl.h"
 #include "input.c"
 
@@ -17,9 +18,38 @@ void build_render_list(AppState* as)
 	
 }
 
-void build_audio_list(AppState* as)
+void add_sound(SoundManager* sound_man, SoundID sound_id)
 {
-	
+    // SDL_Log("add_sound() sound_id: %d", sound_id);
+    sound_man->playing_sounds[sound_man->num_sounds_to_play++] = sound_id;
+    // sound_man->num_sounds_to_play += 1;
+}
+
+void clear_sound_list(SoundManager* sound_man)
+{
+    // for (u32 s=sound_man->num_sounds_to_play; s<=0; s--)
+    for (u32 s=sound_man->num_sounds_to_play; s>0; s--)
+    {
+        sound_man->playing_sounds[s] = SFX_NO_SOUND;
+    }
+    sound_man->num_sounds_to_play = 0;    
+}
+
+void build_audio_list(AppState* as, GameInput* game_input)
+{
+    SoundManager* sound_man = &as->sound_manager;	
+	// Test Audio
+
+	//SDL_Log("bytes queued: %i", SDL_GetAudioStreamQueued(stream));
+	if (game_input->keyboard_state.key[KEY_Q] == BUTTON_PRESSED)
+	{
+		add_sound(sound_man, SFX_COIN);
+	}
+
+	if (game_input->keyboard_state.key[KEY_W] == BUTTON_PRESSED)
+	{
+		add_sound(sound_man, SFX_JUMP);
+	}
 }
 
 void update_time(Time* time)
@@ -62,6 +92,9 @@ void platform_update_gamepads(AppState* as) {
 
 void game_step(AppState* as)
 {
+    
+    clear_sound_list(&as->sound_manager);
+
     update_time(&as->time);
 
 	platform_update_gamepads(as);
@@ -71,6 +104,6 @@ void game_step(AppState* as)
     game_update(as);
 
     build_render_list(as);
-    build_audio_list(as);
+    build_audio_list(as, &as->game_input);
 }
 
