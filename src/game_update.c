@@ -92,7 +92,6 @@ void platform_update_gamepads(AppState* as) {
 
 void game_step(AppState* as)
 {
-    //SDL_Log("Game update entered!");
     clear_sound_list(&as->sound_manager);
 
     update_time(&as->time);

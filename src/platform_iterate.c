@@ -15,6 +15,10 @@
 #include "platform_sdl.h"
 #include "super_lib.c"
 
+#ifdef __EMSCRIPTEN__
+#include "game_update.c"  // Make sure this file is compiled into the TU
+#endif
+
 typedef void (*game_step_fn)(AppState* as);
 static game_step_fn game_step_ptr = NULL;
 static void* game_lib = NULL;
@@ -176,6 +180,7 @@ void platform_audio(SoundManager* sound_man)
 
 SDL_AppResult platform_iterate(AppState* as)
 {
+	#ifndef __EMSCRIPTEN
 	if (should_reload_game())
 	{
 		platform_reload_game();
@@ -185,6 +190,12 @@ SDL_AppResult platform_iterate(AppState* as)
 	{
 		game_step_ptr(as);
 	}
+	#endif
+
+	#ifdef __EMSCRIPTEN__
+	game_step(as);
+	#endif
+
 	platform_render(as);
 	platform_audio(&as->sound_manager);
 

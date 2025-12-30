@@ -74,8 +74,10 @@ i64 file_get_timestamp(char* file)
 	SDL_PathInfo path_info;
 	if (!SDL_GetPathInfo(file, &path_info))
 	{
-	 SDL_Log("Could not get timestamp for file!");	
-	 return -1;
+		#ifndef __EMSCRIPTEN__
+		SDL_Log("Could not get timestamp for file!");	
+		#endif
+		return -1;
 	}
 
 	return path_info.modify_time;
