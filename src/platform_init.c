@@ -64,13 +64,13 @@ SDL_AppResult platform_init(void** appstate)
 	//TODO: error handling
 
 	// Video
-	if (!SDL_CreateWindowAndRenderer("SDL3 Skeleton", 640, 480, SDL_WINDOW_RESIZABLE, &as->window, &as->renderer))
+	if (!SDL_CreateWindowAndRenderer("SDL3 Skeleton", 1280, 720, SDL_WINDOW_RESIZABLE, &as->window, &as->renderer))
 	{
 		SDL_Log("Failed to create window/renderer: %s.", SDL_GetError());
 		return SDL_APP_FAILURE;		
 	}
 
-	SDL_SetRenderLogicalPresentation(as->renderer, 320, 180, SDL_LOGICAL_PRESENTATION_LETTERBOX);
+	SDL_SetRenderLogicalPresentation(as->renderer, 640, 360, SDL_LOGICAL_PRESENTATION_LETTERBOX);
 
 
 	// Input
@@ -93,6 +93,11 @@ SDL_AppResult platform_init(void** appstate)
 			SDL_Log("Gamepad Name: %s\n", SDL_GetGamepadName(controller));
 			as->platform_input.platform_gamepad = controller;
 		}
+	}
+
+	for (usize d=0; d<6; d++)
+	{
+		as->game_input.controller_state.deadzone[d] = 1000;
 	}
 
 	// Time

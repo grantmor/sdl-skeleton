@@ -2,6 +2,8 @@
 
 #include "types.h"
 
+#define AXIS_MAX 32767.0
+#define ANALOG_STICK_CORRECTION 0.4142
 #define AXIS_DEADZONE 25
 #define NUM_SCANCODES 128
 #define NUM_MOUSE_BUTTONS 6
@@ -52,9 +54,20 @@ typedef enum {
 	AXIS_TRIGGER_R = 5
 } ControllerAxisMap;
 
+typedef enum {
+	ANALOG_STICK_LEFT,
+	ANALOG_STICK_RIGHT,
+} AnalogStick;
+
+typedef enum {
+	ANALOG_TRIGGER_LEFT,
+	ANALOG_TRIGGER_RIGHT
+} AnalogTrigger;
+
 typedef struct {
 	ButtonState button[18];
 	i16 axis[6];
+	u16 deadzone[6];
 } ControllerState;
 
 typedef struct {

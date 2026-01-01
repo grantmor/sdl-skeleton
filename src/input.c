@@ -10,11 +10,9 @@
 #include "platform_sdl.h"
 
 #include "input.h"
-
-
+#include <math.h>
 
 //TODO: Add features of mapping keys and gamepad controls to "Actions"
-
 
 bool is_axis_pressed(SDL_Gamepad* gp, SDL_GamepadAxis axis, Sign sign, i16 threshold)
 {
@@ -84,7 +82,7 @@ void platform_gamepad_button_state_analog
 	}
 
 	b8 prev_button_state = state_prev->button[button];
-	b8 button_state = is_axis_pressed(gp, axis, sign, AXIS_DEADZONE);
+	b8 button_state = is_axis_pressed(gp, axis, sign, cs->deadzone[axis]);
 
 	if (button_state && prev_button_state)
 	{
@@ -165,6 +163,7 @@ void platform_mouse_state(PlatformMouseState* pms, MouseState* ms)
     pms->rel_y = ms->rel_y;
 }
 
+
 void platform_gamepad_axis_state
 (
 	SDL_Gamepad* gp,
@@ -177,7 +176,6 @@ void platform_gamepad_axis_state
 	i8 sign = (value > 0) - (value < 0);
 	i32 magnitude = SDL_min(SDL_abs(value), SDL_MAX_SINT16);
 	i16 clamped = (i16) (magnitude * sign);
-	//state_prev->axis[]		
 
 	// TODO: Calculate and store relative later?
 	state_prev->axis[axis] = cs->axis[axis];
@@ -241,38 +239,230 @@ void platform_input(
 	platform_mouse_state(&platform_input->mouse_state_prev, &game_input->mouse_state);
 }
 
-void game_input(PlatformInput* platform_input, GameInput* game_input) 
+// Nice API
+ 
+// Buttons
+b8 button_pressed(ControllerState* controller, ControllerMap button)
 {
-	/*
-	ControllerState* cs = &game_input->controller_state;
+	return (controller->button[button] == BUTTON_PRESSED);
+}
 
+b8 button_held(ControllerState* controller, ControllerMap button)
+{
+	return (controller->button[button] == BUTTON_HELD);
+}
+
+b8 button_released(ControllerState* controller, ControllerMap button)
+{
+	return (controller->button[button] == BUTTON_RELEASED);
+}
+
+b8 button_idle(ControllerState* controller, ControllerMap button)
+{
+	return (controller->button[button] == BUTTON_IDLE);
+}
+
+// TODO: DEADZONE
+// Sticks and Triggers
+
+// TODO: Consider making this linear from deadzone instead of from absolute zero
+// FIXME: Make this branchless?
+i16 deadzone(ControllerState* cs, ControllerAxisMap axis)
+{
+	i16 val = cs->axis[axis];
+	i16 deadzone = cs->deadzone[axis];
+
+	if (SDL_abs(val) < deadzone)
+	{
+		return 0;
+	}
+
+	return val;
+}
+
+vf2 stick_vec_left(ControllerState* cs)
+{
+	return (vf2) {
+		deadzone(cs, AXIS_LEFTX) / AXIS_MAX,
+		deadzone(cs, AXIS_LEFTY) / AXIS_MAX
+	};
+}
+
+vf2 stick_vec_right(ControllerState* cs)
+{
+	return (vf2) {
+		deadzone(cs, AXIS_RIGHTX) / AXIS_MAX,
+		deadzone(cs, AXIS_RIGHTY) / AXIS_MAX
+	};
+}
+
+// FIXME: Write homebrew atan2f to eliminate dependency on SDL
+f32 stick_dir_left(ControllerState* cs)
+{
+	return SDL_atan2f
+	(
+	 	deadzone(cs, AXIS_LEFTX) / AXIS_MAX,
+	 	deadzone(cs, AXIS_LEFTY) / AXIS_MAX
+	);
+}
+
+f32 stick_dir_right(ControllerState* cs)
+{
+	return SDL_atan2f
+	(
+		deadzone(cs, AXIS_RIGHTX) / AXIS_MAX,
+		deadzone(cs, AXIS_RIGHTY) / AXIS_MAX);
+}
+
+// FIXME: Replace math.h functions
+f32 stick_mag_left(ControllerState* cs)
+{
+    // 1. Normalize axes to [-1,1]
+    f32 x = 0.0f;
+    f32 y = 0.0f;
+
+    x = deadzone(cs, AXIS_LEFTX) / AXIS_MAX;
+    y = deadzone(cs, AXIS_LEFTY) / AXIS_MAX;
+
+    // 2. Compute absolute values
+    f32 absX = fabsf(x);
+    f32 absY = fabsf(y);
+
+    // 3. Polynomial approximation
+    f32 minVal = (absX < absY) ? absX : absY;
+    f32 magnitude = absX + absY - minVal * ANALOG_STICK_CORRECTION;
+
+    // 4. Clamp to 1.0
+    if (magnitude > 1.0f)
+        magnitude = 1.0f;
+
+    return magnitude;
+}
+
+f32 stick_mag_right(ControllerState* cs)
+{
+    // 1. Normalize axes to [-1,1]
+    f32 x = 0.0f;
+    f32 y = 0.0f;
+
+    x = deadzone(cs, AXIS_RIGHTX) / AXIS_MAX;
+    y = deadzone(cs, AXIS_RIGHTY) / AXIS_MAX;
+
+    // 2. Compute absolute values
+    f32 absX = fabsf(x);
+    f32 absY = fabsf(y);
+
+    // 3. Polynomial approximation
+    f32 minVal = (absX < absY) ? absX : absY;
+    f32 magnitude = absX + absY - minVal * ANALOG_STICK_CORRECTION;
+
+    // 4. Clamp to 1.0
+    if (magnitude > 1.0f)
+        magnitude = 1.0f;
+
+    return magnitude;
+}
+
+f32 trigger_mag_left(ControllerState* cs)
+{
+	return deadzone(cs, AXIS_TRIGGER_L) / AXIS_MAX;
+}
+
+f32 trigger_mag_right(ControllerState* cs)
+{
+	return deadzone(cs, AXIS_TRIGGER_R) / AXIS_MAX;
+}
+
+// Keys
+b8 key_pressed(KeyboardState* keyboard, KeyboardMap key)
+{
+	return (keyboard->key[key] == BUTTON_PRESSED);
+}
+
+b8 key_held(KeyboardState* keyboard, KeyboardMap key)
+{
+	return (keyboard->key[key] == BUTTON_HELD);
+}
+
+b8 key_released(KeyboardState* keyboard, KeyboardMap key)
+{
+	return (keyboard->key[key] == BUTTON_RELEASED);
+}
+
+b8 key_idle(KeyboardState* keyboard, KeyboardMap key)
+{
+	return (keyboard->key[key] == BUTTON_IDLE);
+}
+
+// Mouse
+b8 mouse_button_pressed(MouseState* ms, MouseButtonMap bs)
+{
+	return (ms->button[bs] == BUTTON_PRESSED);
+}
+
+b8 mouse_button_held(MouseState* ms, MouseButtonMap bs)
+{
+	return (ms->button[bs] == BUTTON_HELD);
+}
+
+b8 mouse_button_released(MouseState* ms, MouseButtonMap bs)
+{
+	return (ms->button[bs] == BUTTON_RELEASED);
+}
+
+b8 mouse_button_idle(MouseState* ms, MouseButtonMap bs)
+{
+	return (ms->button[bs] == BUTTON_IDLE);
+}
+
+
+void game_input(GameInput* game_input) 
+{
+
+	ControllerState* cs = &game_input->controller_state;
+/*
 	// Face Buttons
-	if (cs->button[BUTTON_NORTH] == BUTTON_HELD) SDL_Log("North Button held");
-	if (cs->button[BUTTON_SOUTH] == BUTTON_HELD) SDL_Log("South Button held");
-	if (cs->button[BUTTON_EAST]  == BUTTON_HELD) SDL_Log("East Button held");
-	if (cs->button[BUTTON_WEST]  == BUTTON_HELD) SDL_Log("West Button held");
+	if (button_pressed(cs, BUTTON_NORTH)) SDL_Log("North Button Pressed");
+	if (button_pressed(cs, BUTTON_SOUTH)) SDL_Log("South Button Pressed");
+	if (button_pressed(cs, BUTTON_EAST)) SDL_Log("East Button Pressed");
+	if (button_pressed(cs, BUTTON_WEST)) SDL_Log("West Button Pressed");
 
 	// DPAD
-	if (cs->button[DPAD_UP]    == BUTTON_HELD) SDL_Log("DPAD Up held");
-	if (cs->button[DPAD_DOWN]  == BUTTON_HELD) SDL_Log("DPAD Down held");
-	if (cs->button[DPAD_LEFT]  == BUTTON_HELD) SDL_Log("DPAD Left held");
-	if (cs->button[DPAD_RIGHT] == BUTTON_HELD) SDL_Log("DPAD Right held");
+	if (button_pressed(cs, DPAD_UP)) SDL_Log("DPAD Up Pressed");
+	if (button_pressed(cs, DPAD_DOWN)) SDL_Log("DPAD Down Pressed");
+	if (button_pressed(cs, DPAD_LEFT)) SDL_Log("DPAD Left Pressed");
+	if (button_pressed(cs, DPAD_RIGHT)) SDL_Log("DPAD Right Pressed");
 
 	// Shoulder
-	if (cs->button[SHOULDER_LEFT]  == BUTTON_HELD) SDL_Log("Left Shoulder held");
-	if (cs->button[SHOULDER_RIGHT] == BUTTON_HELD) SDL_Log("Right Shoulder held");
+	if (button_pressed(cs, SHOULDER_LEFT)) SDL_Log("Left Shoulder Button Pressed");
+	if (button_pressed(cs, SHOULDER_RIGHT)) SDL_Log("Right Shoulder Button Pressed");
 
 	// Triggers
-	if (cs->button[TRIGGER_LEFT]  == BUTTON_HELD) SDL_Log("Left Trigger held");
-	if (cs->button[TRIGGER_RIGHT] == BUTTON_HELD) SDL_Log("Right Trigger held");
+	if (button_pressed(cs, TRIGGER_LEFT)) SDL_Log("Left Trigger Button Pressed");
+	if (button_pressed(cs, TRIGGER_RIGHT)) SDL_Log("Right Trigger Button Pressed");
 
 	// Sticks
-	if (cs->button[CLICK_LEFT]  == BUTTON_HELD) SDL_Log("Left Stick Click held");
-	if (cs->button[CLICK_RIGHT] == BUTTON_HELD) SDL_Log("Right Stick Click held");
+	if (button_pressed(cs, CLICK_LEFT)) SDL_Log("Left Stick Button Pressed");
+	if (button_pressed(cs, CLICK_RIGHT)) SDL_Log("Right Stick Button Pressed");
 
 	// System
-	if (cs->button[BUTTON_START] == BUTTON_HELD) SDL_Log("Start Button held");
-	if (cs->button[BUTTON_SELECT]  == BUTTON_HELD) SDL_Log("Select Button held");
+	if (button_pressed(cs, BUTTON_START)) SDL_Log("Start Button Pressed");
+	if (button_pressed(cs, BUTTON_SELECT)) SDL_Log("Select Button Pressed");
+
+	SDL_Log("Left Stick Vector x: %f", stick_vec_left(cs).x); 
+	SDL_Log("Left Stick Vector y: %f", stick_vec_left(cs).y); 
+
+	SDL_Log("Left Stick Dir: %f", stick_dir_left(cs));
+	SDL_Log("Left Stick Mag: %f", stick_mag_left(cs));
+
+	SDL_Log("Right Stick Vector x: %f", stick_vec_right(cs).x);
+	SDL_Log("Right Stick Vector y: %f", stick_vec_right(cs).y);
+
+	SDL_Log("Right Stick Dir: %f", stick_dir_right(cs));
+	SDL_Log("Right Stick Mag: %f", stick_mag_right(cs));
+
+	SDL_Log("Left Trigger Mag: %f", trigger_mag_left(cs));
+	SDL_Log("Right Trigger Mag: %f", trigger_mag_right(cs));
 
 	// Controller Axes
 	SDL_Log("Axis 0:%i", cs->axis[0]);
@@ -285,93 +475,85 @@ void game_input(PlatformInput* platform_input, GameInput* game_input)
 	// Keyboard
 	KeyboardState* ks = &game_input->keyboard_state;
 
-	if (ks->key[KEY_0] == BUTTON_HELD) SDL_Log("0 key held");
-	if (ks->key[KEY_1] == BUTTON_HELD) SDL_Log("1 key held");
-	if (ks->key[KEY_2] == BUTTON_HELD) SDL_Log("2 key held");
-	if (ks->key[KEY_3] == BUTTON_HELD) SDL_Log("3 key held");
-	if (ks->key[KEY_4] == BUTTON_HELD) SDL_Log("4 key held");
-	if (ks->key[KEY_5] == BUTTON_HELD) SDL_Log("5 key held");
-	if (ks->key[KEY_6] == BUTTON_HELD) SDL_Log("6 key held");
-	if (ks->key[KEY_7] == BUTTON_HELD) SDL_Log("7 key held");
-	if (ks->key[KEY_8] == BUTTON_HELD) SDL_Log("8 key held");
-	if (ks->key[KEY_9] == BUTTON_HELD) SDL_Log("9 key held");
+	if (key_pressed(ks, KEY_0)) SDL_Log("0 key pressed");
+	if (key_pressed(ks, KEY_1)) SDL_Log("1 key pressed");
+	if (key_pressed(ks, KEY_2)) SDL_Log("2 key pressed");
+	if (key_pressed(ks, KEY_3)) SDL_Log("3 key pressed");
+	if (key_pressed(ks, KEY_4)) SDL_Log("4 key pressed");
+	if (key_pressed(ks, KEY_5)) SDL_Log("5 key pressed");
+	if (key_pressed(ks, KEY_6)) SDL_Log("6 key pressed");
+	if (key_pressed(ks, KEY_7)) SDL_Log("7 key pressed");
+	if (key_pressed(ks, KEY_8)) SDL_Log("8 key pressed");
+	if (key_pressed(ks, KEY_9)) SDL_Log("9 key pressed");
 
-	if (ks->key[KEY_A] == BUTTON_HELD) SDL_Log("A key held");
-	if (ks->key[KEY_B] == BUTTON_HELD) SDL_Log("B key held");
-	if (ks->key[KEY_C] == BUTTON_HELD) SDL_Log("C key held");
-	if (ks->key[KEY_D] == BUTTON_HELD) SDL_Log("D key held");
-	if (ks->key[KEY_E] == BUTTON_HELD) SDL_Log("E key held");
-	if (ks->key[KEY_F] == BUTTON_HELD) SDL_Log("F key held");
-	if (ks->key[KEY_G] == BUTTON_HELD) SDL_Log("G key held");
-	if (ks->key[KEY_H] == BUTTON_HELD) SDL_Log("H key held");
-	if (ks->key[KEY_I] == BUTTON_HELD) SDL_Log("I key held");
-	if (ks->key[KEY_J] == BUTTON_HELD) SDL_Log("J key held");
-	if (ks->key[KEY_K] == BUTTON_HELD) SDL_Log("K key held");
-	if (ks->key[KEY_L] == BUTTON_HELD) SDL_Log("L key held");
-	if (ks->key[KEY_M] == BUTTON_HELD) SDL_Log("M key held");
-	if (ks->key[KEY_N] == BUTTON_HELD) SDL_Log("N key held");
-	if (ks->key[KEY_O] == BUTTON_HELD) SDL_Log("O key held");
-	if (ks->key[KEY_P] == BUTTON_HELD) SDL_Log("P key held");
-	if (ks->key[KEY_Q] == BUTTON_HELD) SDL_Log("Q key held");
-	if (ks->key[KEY_R] == BUTTON_HELD) SDL_Log("R key held");
-	if (ks->key[KEY_S] == BUTTON_HELD) SDL_Log("S key held");
-	if (ks->key[KEY_T] == BUTTON_HELD) SDL_Log("T key held");
-	if (ks->key[KEY_U] == BUTTON_HELD) SDL_Log("U key held");
-	if (ks->key[KEY_V] == BUTTON_HELD) SDL_Log("V key held");
-	if (ks->key[KEY_W] == BUTTON_HELD) SDL_Log("W key held");
-	if (ks->key[KEY_X] == BUTTON_HELD) SDL_Log("X key held");
-	if (ks->key[KEY_Y] == BUTTON_HELD) SDL_Log("Y key held");
-	if (ks->key[KEY_Z] == BUTTON_HELD) SDL_Log("Z key held");
+	if (key_pressed(ks, KEY_A)) SDL_Log("A key pressed");
+	if (key_pressed(ks, KEY_B)) SDL_Log("B key pressed");
+	if (key_pressed(ks, KEY_C)) SDL_Log("C key pressed");
+	if (key_pressed(ks, KEY_D)) SDL_Log("D key pressed");
+	if (key_pressed(ks, KEY_E)) SDL_Log("E key pressed");
+	if (key_pressed(ks, KEY_F)) SDL_Log("F key pressed");
+	if (key_pressed(ks, KEY_G)) SDL_Log("G key pressed");
+	if (key_pressed(ks, KEY_H)) SDL_Log("H key pressed");
+	if (key_pressed(ks, KEY_I)) SDL_Log("I key pressed");
+	if (key_pressed(ks, KEY_J)) SDL_Log("J key pressed");
+	if (key_pressed(ks, KEY_K)) SDL_Log("K key pressed");
+	if (key_pressed(ks, KEY_L)) SDL_Log("L key pressed");
+	if (key_pressed(ks, KEY_M)) SDL_Log("M key pressed");
+	if (key_pressed(ks, KEY_N)) SDL_Log("N key pressed");
+	if (key_pressed(ks, KEY_O)) SDL_Log("O key pressed");
+	if (key_pressed(ks, KEY_P)) SDL_Log("P key pressed");
+	if (key_pressed(ks, KEY_Q)) SDL_Log("Q key pressed");
+	if (key_pressed(ks, KEY_R)) SDL_Log("R key pressed");
+	if (key_pressed(ks, KEY_S)) SDL_Log("S key pressed");
+	if (key_pressed(ks, KEY_T)) SDL_Log("T key pressed");
+	if (key_pressed(ks, KEY_U)) SDL_Log("U key pressed");
+	if (key_pressed(ks, KEY_V)) SDL_Log("V key pressed");
+	if (key_pressed(ks, KEY_W)) SDL_Log("W key pressed");
+	if (key_pressed(ks, KEY_X)) SDL_Log("X key pressed");
+	if (key_pressed(ks, KEY_Y)) SDL_Log("Y key pressed");
+	if (key_pressed(ks, KEY_Z)) SDL_Log("Z key pressed");
 
-	if (ks->key[KEY_MINUS] == BUTTON_HELD) SDL_Log("MINUS key held");
-	if (ks->key[KEY_EQUALS] == BUTTON_HELD) SDL_Log("EQUALS key held");
-	if (ks->key[KEY_LEFTBRACKET] == BUTTON_HELD) SDL_Log("LEFTBRACKET key held");
-	if (ks->key[KEY_RIGHTBRACKET] == BUTTON_HELD) SDL_Log("RIGHTBRACKET key held");
-	if (ks->key[KEY_BACKSLASH] == BUTTON_HELD) SDL_Log("BACKSLASH key held");
-	if (ks->key[KEY_SEMICOLON] == BUTTON_HELD) SDL_Log("SEMICOLON key held");
-	if (ks->key[KEY_APOSTROPHE] == BUTTON_HELD) SDL_Log("APOSTROPHE key held");
-	if (ks->key[KEY_GRAVE] == BUTTON_HELD) SDL_Log("GRAVE key held");
-	if (ks->key[KEY_COMMA] == BUTTON_HELD) SDL_Log("COMMA key held");
-	if (ks->key[KEY_PERIOD] == BUTTON_HELD) SDL_Log("PERIOD key held");
-	if (ks->key[KEY_SLASH] == BUTTON_HELD) SDL_Log("SLASH key held");
+	if (key_pressed(ks, KEY_MINUS)) SDL_Log("MINUS key pressed");
+	if (key_pressed(ks, KEY_EQUALS)) SDL_Log("EQUALS key pressed");
+	if (key_pressed(ks, KEY_LEFTBRACKET)) SDL_Log("LEFTBRACKET key pressed");
+	if (key_pressed(ks, KEY_RIGHTBRACKET)) SDL_Log("RIGHTBRACKET key pressed");
+	if (key_pressed(ks, KEY_BACKSLASH)) SDL_Log("BACKSLASH key pressed");
+	if (key_pressed(ks, KEY_SEMICOLON)) SDL_Log("SEMICOLON key pressed");
+	if (key_pressed(ks, KEY_APOSTROPHE)) SDL_Log("APOSTROPHE key pressed");
+	if (key_pressed(ks, KEY_GRAVE)) SDL_Log("GRAVE key pressed");
+	if (key_pressed(ks, KEY_COMMA)) SDL_Log("COMMA key pressed");
+	if (key_pressed(ks, KEY_PERIOD)) SDL_Log("PERIOD key pressed");
+	if (key_pressed(ks, KEY_SLASH)) SDL_Log("SLASH key pressed");
 
-	if (ks->key[KEY_ESCAPE] == BUTTON_HELD) SDL_Log("ESCAPE key held");
-	if (ks->key[KEY_TAB] == BUTTON_HELD) SDL_Log("TAB key held");
-	if (ks->key[KEY_SPACE] == BUTTON_HELD) SDL_Log("SPACE key held");
+	if (key_pressed(ks, KEY_ESCAPE)) SDL_Log("ESCAPE key pressed");
+	if (key_pressed(ks, KEY_TAB)) SDL_Log("TAB key pressed");
+	if (key_pressed(ks, KEY_SPACE)) SDL_Log("SPACE key pressed");
 
-	if (ks->key[KEY_F1] == BUTTON_HELD) SDL_Log("F1 key held");
-	if (ks->key[KEY_F2] == BUTTON_HELD) SDL_Log("F2 key held");
-	if (ks->key[KEY_F3] == BUTTON_HELD) SDL_Log("F3 key held");
-	if (ks->key[KEY_F4] == BUTTON_HELD) SDL_Log("F4 key held");
-	if (ks->key[KEY_F5] == BUTTON_HELD) SDL_Log("F5 key held");
-	if (ks->key[KEY_F6] == BUTTON_HELD) SDL_Log("F6 key held");
-	if (ks->key[KEY_F7] == BUTTON_HELD) SDL_Log("F7 key held");
-	if (ks->key[KEY_F8] == BUTTON_HELD) SDL_Log("F8 key held");
-	if (ks->key[KEY_F9] == BUTTON_HELD) SDL_Log("F9 key held");
-	if (ks->key[KEY_F10] == BUTTON_HELD) SDL_Log("F10 key held");
-	if (ks->key[KEY_F11] == BUTTON_HELD) SDL_Log("F11 key held");
-	if (ks->key[KEY_F12] == BUTTON_HELD) SDL_Log("F12 key held");
+	if (key_pressed(ks, KEY_F1)) SDL_Log("F1 key pressed");
+	if (key_pressed(ks, KEY_F2)) SDL_Log("F2 key pressed");
+	if (key_pressed(ks, KEY_F3)) SDL_Log("F3 key pressed");
+	if (key_pressed(ks, KEY_F4)) SDL_Log("F4 key pressed");
+	if (key_pressed(ks, KEY_F5)) SDL_Log("F5 key pressed");
+	if (key_pressed(ks, KEY_F6)) SDL_Log("F6 key pressed");
+	if (key_pressed(ks, KEY_F7)) SDL_Log("F7 key pressed");
+	if (key_pressed(ks, KEY_F8)) SDL_Log("F8 key pressed");
+	if (key_pressed(ks, KEY_F9)) SDL_Log("F9 key pressed");
+	if (key_pressed(ks, KEY_F10)) SDL_Log("F10 key pressed");
+	if (key_pressed(ks, KEY_F11)) SDL_Log("F11 key pressed");
+	if (key_pressed(ks, KEY_F12)) SDL_Log("F12 key pressed");
 
 	// Mouse
-	PlatformMouseState* pms = &platform_input->mouse_state_prev;
 	MouseState* ms = &game_input->mouse_state;
+	if (mouse_button_pressed(ms, MOUSE_BUTTON_LEFT)) SDL_Log("Left Mouse Button Pressed");
+	if (mouse_button_pressed(ms, MOUSE_BUTTON_RIGHT)) SDL_Log("Right Mouse Button Pressed");
+	if (mouse_button_pressed(ms, MOUSE_BUTTON_MIDDLE)) SDL_Log("Middle Mouse Button Pressed");
+	if (mouse_button_pressed(ms, MOUSE_BUTTON_SIDE_1)) SDL_Log("Side Mouse Button 1 Pressed");
+	if (mouse_button_pressed(ms, MOUSE_BUTTON_SIDE_2)) SDL_Log("Side Mouse Button 2 Pressed");
 
 	SDL_Log("Axis Right X Value: %f", ms->pos_x);
 	SDL_Log("Axis Right Y Value: %f", ms->pos_y);
 
 	SDL_Log("Axis Right X Relative Value: %f", ms->rel_x);
 	SDL_Log("Axis Right Y Relative Value: %f", ms->rel_y);
-
-	for (u64 b=0; b<NUM_MOUSE_BUTTONS; b++)
-	{
-		if (ms->button[b] == BUTTON_HELD)
-		{
-			if (b == MOUSE_BUTTON_LEFT) SDL_Log("Left Mouse Button Held");
-			if (b == MOUSE_BUTTON_RIGHT) SDL_Log("Right Mouse Button Held");
-			if (b == MOUSE_BUTTON_MIDDLE) SDL_Log("Middle Mouse Button Held");
-			if (b == MOUSE_BUTTON_SIDE_1) SDL_Log("Mouse Side 1 Button Held");
-			if (b == MOUSE_BUTTON_SIDE_2) SDL_Log("Mouse Side 2 Button Held");
-		}
-	}
-	*/
+*/
 }

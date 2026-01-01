@@ -98,7 +98,7 @@ void game_step(AppState* as)
 
 	platform_update_gamepads(as);
     platform_input(&as->platform_input, &as->game_input);    
-    game_input(&as->platform_input, &as->game_input);
+    game_input(&as->game_input);
 
     game_update(as);
 
