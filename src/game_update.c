@@ -13,19 +13,19 @@ void game_update(AppState* as)
 	
 }
 
-void build_render_list(AppState* as)
+void render_list_build(AppState* as)
 {
 	
 }
 
-void add_sound(SoundManager* sound_man, SoundID sound_id)
+void sound_add(SoundManager* sound_man, SoundID sound_id)
 {
     // SDL_Log("add_sound() sound_id: %d", sound_id);
     sound_man->playing_sounds[sound_man->num_sounds_to_play++] = sound_id;
     // sound_man->num_sounds_to_play += 1;
 }
 
-void clear_sound_list(SoundManager* sound_man)
+void sound_list_clear(SoundManager* sound_man)
 {
     // for (u32 s=sound_man->num_sounds_to_play; s<=0; s--)
     for (i32 s=sound_man->num_sounds_to_play; s>0; s--)
@@ -35,7 +35,7 @@ void clear_sound_list(SoundManager* sound_man)
     sound_man->num_sounds_to_play = 0;    
 }
 
-void build_audio_list(AppState* as, GameInput* game_input)
+void audio_list_build(AppState* as, GameInput* game_input)
 {
     SoundManager* sound_man = &as->sound_manager;	
 	// Test Audio
@@ -43,16 +43,16 @@ void build_audio_list(AppState* as, GameInput* game_input)
 	//SDL_Log("bytes queued: %i", SDL_GetAudioStreamQueued(stream));
 	if (game_input->keyboard_state.key[KEY_Q] == BUTTON_PRESSED)
 	{
-		add_sound(sound_man, SFX_COIN);
+		sound_add(sound_man, SFX_COIN);
 	}
 
 	if (game_input->keyboard_state.key[KEY_W] == BUTTON_PRESSED)
 	{
-		add_sound(sound_man, SFX_JUMP);
+		sound_add(sound_man, SFX_JUMP);
 	}
 }
 
-void update_time(Time* time)
+void time_update(Time* time)
 {
     u64 pc = SDL_GetPerformanceCounter();
     u64 freq = SDL_GetPerformanceFrequency();
@@ -74,7 +74,7 @@ void update_time(Time* time)
 }
 
 // TODO: This needs to be made more robust later
-void platform_update_gamepads(AppState* as) {
+void platform_gamepad_update(AppState* as) {
     SDL_PumpEvents();
     SDL_UpdateGamepads();
 
@@ -92,17 +92,17 @@ void platform_update_gamepads(AppState* as) {
 
 void game_step(AppState* as)
 {
-    clear_sound_list(&as->sound_manager);
+    sound_list_clear(&as->sound_manager);
 
-    update_time(&as->time);
+    time_update(&as->time);
 
-	platform_update_gamepads(as);
+	platform_gamepad_update(as);
     platform_input(&as->platform_input, &as->game_input);    
     game_input(&as->game_input);
 
     game_update(as);
 
-    build_render_list(as);
-    build_audio_list(as, &as->game_input);
+    render_list_build(as);
+    audio_list_build(as, &as->game_input);
 }
 

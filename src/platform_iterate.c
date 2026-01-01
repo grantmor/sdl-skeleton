@@ -146,7 +146,7 @@ void platform_render(AppState* as)
 	SDL_RenderPresent(renderer);
 }
 
-void play_sound_clip(SoundManager* sound_man, SoundClip* clip)
+void sound_clip_play(SoundManager* sound_man, SoundClip* clip)
 {
 	for (u64 c=0; c<NUM_SFX_CHANNELS; c++)	
 	{
@@ -172,7 +172,7 @@ void platform_audio(SoundManager* sound_man)
 	{
 		if (sound_man->playing_sounds[s] != SFX_NO_SOUND)
 		{
-			play_sound_clip(sound_man, &sound_man->clips[sound_man->playing_sounds[s]]);
+			sound_clip_play(sound_man, &sound_man->clips[sound_man->playing_sounds[s]]);
 		}
 	}
 }

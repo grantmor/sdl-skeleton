@@ -29,8 +29,3 @@ typedef struct {
 	u32 loaded_sounds;
 	u32 num_sounds_to_play;
 } SoundManager;
-
-void play_sound_clip(SoundManager* sound_man, SoundClip* clip);
-
-void update_active_channels(SoundManager* sound_man);
-
