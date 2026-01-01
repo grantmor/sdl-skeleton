@@ -27,7 +27,7 @@ static u64 last_game_reload = 0;
 
 bool should_reload_game()
 {
-	u64 current_timestamp = file_get_timestamp("./game_update.so");
+	u64 current_timestamp = file_get_timestamp("./build/native/game_update.so");
 
 	if (current_timestamp == -1)
 	{
@@ -70,7 +70,7 @@ static bool copy_game_library(const char *src, const char *dst)
 
 void platform_reload_game(void)
 {
-    const char* compiled_lib = "./game_update.so";
+    const char* compiled_lib = "./build/native/game_update.so";
 
     // Unload old library first
     if (game_lib)
@@ -83,7 +83,7 @@ void platform_reload_game(void)
 
     // Copy to a unique filename
     char copied_lib[64];
-    SDL_snprintf(copied_lib, sizeof(copied_lib), "./game_update_load_%llu.so", (unsigned long long) SDL_GetTicks());
+    SDL_snprintf(copied_lib, sizeof(copied_lib), "./build/native/game_update_load_%llu.so", (unsigned long long) SDL_GetTicks());
 
     SDL_Log("Copying %s -> %s", compiled_lib, copied_lib);
 
@@ -165,9 +165,9 @@ void sound_clip_play(SoundManager* sound_man, SoundClip* clip)
 	}
 }
 
-// void platform_audio(AppState* as)
 void platform_audio(SoundManager* sound_man)
 {
+	// SDL_Log("platform_audio() entered");
 	for (u32 s=0; s<sound_man->num_sounds_to_play; s++)
 	{
 		if (sound_man->playing_sounds[s] != SFX_NO_SOUND)
@@ -176,7 +176,6 @@ void platform_audio(SoundManager* sound_man)
 		}
 	}
 }
-
 
 SDL_AppResult platform_iterate(AppState* as)
 {

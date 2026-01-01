@@ -19,6 +19,7 @@
 #include "platform_sdl.h"
 
 static const char RES_DIR[] = "res";
+static const char IMG_DIR[] = "image";
 static const char SFX_DIR[] = "sound";
 
 SDL_EnumerationResult load_wavs(void* userdata, const char* dir, const char* file)
@@ -135,8 +136,7 @@ SDL_AppResult platform_init(void** appstate)
 
 	// Load wavs
 	as->sound_manager.loaded_sounds = 0;
-	char* sound_dir;
-	SDL_asprintf(&sound_dir, "%s%s/%s", SDL_GetBasePath(), RES_DIR, SFX_DIR);
+	char* sound_dir = "res/sound";
 	SDL_EnumerateDirectory(sound_dir, load_wavs, &as->sound_manager);
 
 	// Initialize Audio

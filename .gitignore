@@ -1,9 +1,5 @@
 # Project Specific
-res/*
 todo.txt
-ext/*
-inc/*
-lib/*
 
 # built objects
 index*

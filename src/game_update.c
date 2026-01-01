@@ -21,15 +21,13 @@ void render_list_build(AppState* as)
 
 void sound_list_add(SoundManager* sound_man, SoundID sound_id)
 {
-    // SDL_Log("add_sound() sound_id: %d", sound_id);
     sound_man->playing_sounds[sound_man->num_sounds_to_play++] = sound_id;
     // sound_man->num_sounds_to_play += 1;
 }
 
 void sound_list_clear(SoundManager* sound_man)
 {
-    // for (u32 s=sound_man->num_sounds_to_play; s<=0; s--)
-    for (i32 s=sound_man->num_sounds_to_play; s>=0; s--)
+    for (i32 s = 0; s < sound_man->num_sounds_to_play; s++)
     {
         sound_man->playing_sounds[s] = SFX_NO_SOUND;
     }

@@ -65,6 +65,7 @@ typedef struct {
 
 void platform_sprite_atlas_load(SDL_Renderer* renderer, SpriteAtlas* atlas)
 {
+	SDL_Log("atlas path: %s", atlas->path);
 	if (atlas->atlas)
 	{
 		SDL_DestroyTexture(atlas->atlas);

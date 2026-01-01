@@ -36,6 +36,7 @@ u8* arena_alloc(ArenaAllocator* alloc, usize size)
 	u8* result = NULL;
 
 	// Ensure memory is aligned to 16 bytes
+	// FIXME: actually 8 bytes?
 	usize aligned_size = (size + 7) & ~ 7;
 	if (alloc->used + aligned_size <= alloc->capacity)
 	{
