@@ -5,6 +5,7 @@
 #include <SDL3/SDL_timer.h>
 
 #include "audio.h"
+#include "input.h"
 #include "platform_sdl.h"
 #include "input.c"
 
@@ -18,7 +19,7 @@ void render_list_build(AppState* as)
 	
 }
 
-void sound_add(SoundManager* sound_man, SoundID sound_id)
+void sound_list_add(SoundManager* sound_man, SoundID sound_id)
 {
     // SDL_Log("add_sound() sound_id: %d", sound_id);
     sound_man->playing_sounds[sound_man->num_sounds_to_play++] = sound_id;
@@ -38,17 +39,18 @@ void sound_list_clear(SoundManager* sound_man)
 void audio_list_build(AppState* as, GameInput* game_input)
 {
     SoundManager* sound_man = &as->sound_manager;	
-	// Test Audio
+    KeyboardState* ks = &game_input->keyboard_state;
 
+	// Test Audio
 	//SDL_Log("bytes queued: %i", SDL_GetAudioStreamQueued(stream));
-	if (game_input->keyboard_state.key[KEY_Q] == BUTTON_PRESSED)
+	if (key_pressed(ks, KEY_Q)) 
 	{
-		sound_add(sound_man, SFX_COIN);
+		sound_list_add(sound_man, SFX_COIN);
 	}
 
-	if (game_input->keyboard_state.key[KEY_W] == BUTTON_PRESSED)
+	if (key_pressed(ks, KEY_W))
 	{
-		sound_add(sound_man, SFX_JUMP);
+		sound_list_add(sound_man, SFX_JUMP);
 	}
 }
 

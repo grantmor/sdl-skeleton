@@ -4,7 +4,7 @@ void game_update(AppState* as);
 
 void build_render_list(AppState* as);
 
-void sound_add(SoundManager* sound_man, SoundID sound_id);
+void sound_list_add(SoundManager* sound_man, SoundID sound_id);
 
 void clear_sound_list(SoundManager* sound_man);
 
