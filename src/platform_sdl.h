@@ -63,24 +63,9 @@ typedef struct {
 	//SoundClip* sound_clip;
 } AppState;
 
-void platform_sprite_atlas_load(SDL_Renderer* renderer, SpriteAtlas* atlas)
-{
-	SDL_Log("atlas path: %s", atlas->path);
-	if (atlas->atlas)
-	{
-		SDL_DestroyTexture(atlas->atlas);
-	}
+// *** File IO ***
+i64 platform_file_timestamp_get(char* file);
 
-	SDL_Surface* sprite_atlas_surf = SDL_LoadBMP(atlas->path);
-	SDL_Texture* sprite_atlas_tex = SDL_CreateTextureFromSurface(renderer, sprite_atlas_surf);
-	if (!sprite_atlas_tex) {
-	    SDL_Log("Failed to create texture: %s", SDL_GetError());
-	}
-	else
-	{
-		atlas->atlas = sprite_atlas_tex;
-		atlas->modified = file_get_timestamp(atlas->path);
-		SDL_DestroySurface(sprite_atlas_surf);
-		SDL_SetTextureScaleMode(atlas->atlas, SDL_SCALEMODE_NEAREST);
-	}
-}
+void platform_file_load();
+
+void platform_sprite_atlas_load(SDL_Renderer* renderer, SpriteAtlas* atlas);

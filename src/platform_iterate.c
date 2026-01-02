@@ -27,7 +27,7 @@ static u64 last_game_reload = 0;
 
 bool should_reload_game()
 {
-	u64 current_timestamp = file_get_timestamp("./build/native/game_update.so");
+	u64 current_timestamp = platform_file_timestamp_get("./build/native/game_update.so");
 
 	if (current_timestamp == -1)
 	{
@@ -42,7 +42,7 @@ bool should_reload_game()
 	return false;
 }
 
-static bool copy_game_library(const char *src, const char *dst)
+static bool platform_file_copy(const char *src, const char *dst)
 {
     SDL_IOStream *in  = SDL_IOFromFile(src, "rb");
     if (!in) return false;
@@ -87,7 +87,7 @@ void platform_reload_game(void)
 
     SDL_Log("Copying %s -> %s", compiled_lib, copied_lib);
 
-    if (!copy_game_library(compiled_lib, copied_lib))
+    if (!platform_file_copy(compiled_lib, copied_lib))
     {
         SDL_Log("Failed to copy game library: %s", SDL_GetError());
         return;
@@ -125,7 +125,7 @@ void platform_render(AppState* as)
 	SDL_Renderer* renderer = as->renderer;
 	SpriteAtlas* sprite_atlas = &as->sprite_atlas;
 
-	if (file_get_timestamp(sprite_atlas->path) > sprite_atlas->modified)
+	if (platform_file_timestamp_get(sprite_atlas->path) > sprite_atlas->modified)
 	{
 		platform_sprite_atlas_load(renderer, sprite_atlas);
 	}
