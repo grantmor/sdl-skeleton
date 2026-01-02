@@ -10,7 +10,6 @@
 #include "platform_sdl.h"
 
 #include "input.h"
-#include <math.h>
 
 //TODO: Add features of mapping keys and gamepad controls to "Actions"
 
@@ -66,7 +65,6 @@ void platform_gamepad_button_state_analog
 	ControllerState* cs
 )
 {
-
 	SDL_GamepadAxis axis;
 
 	switch (button)
@@ -174,7 +172,7 @@ void platform_gamepad_axis_state
 {
 	i32 value = SDL_GetGamepadAxis(gp, axis);
 	i8 sign = (value > 0) - (value < 0);
-	i32 magnitude = SDL_min(SDL_abs(value), SDL_MAX_SINT16);
+	i32 magnitude = sl_mini(sl_absi(value), SDL_MAX_SINT16);
 	i16 clamped = (i16) (magnitude * sign);
 
 	// TODO: Calculate and store relative later?
@@ -272,7 +270,7 @@ i16 deadzone(ControllerState* cs, ControllerAxisMap axis)
 	i16 val = cs->axis[axis];
 	i16 deadzone = cs->deadzone[axis];
 
-	if (SDL_abs(val) < deadzone)
+	if (sl_absi(val) < deadzone)
 	{
 		return 0;
 	}
@@ -314,7 +312,6 @@ f32 stick_dir_right(ControllerState* cs)
 		deadzone(cs, AXIS_RIGHTY) / AXIS_MAX);
 }
 
-// FIXME: Replace math.h functions
 f32 stick_mag_left(ControllerState* cs)
 {
     // 1. Normalize axes to [-1,1]
@@ -325,8 +322,8 @@ f32 stick_mag_left(ControllerState* cs)
     y = deadzone(cs, AXIS_LEFTY) / AXIS_MAX;
 
     // 2. Compute absolute values
-    f32 absX = fabsf(x);
-    f32 absY = fabsf(y);
+    f32 absX = sl_absf(x);
+    f32 absY = sl_absf(y);
 
     // 3. Polynomial approximation
     f32 minVal = (absX < absY) ? absX : absY;
@@ -349,8 +346,8 @@ f32 stick_mag_right(ControllerState* cs)
     y = deadzone(cs, AXIS_RIGHTY) / AXIS_MAX;
 
     // 2. Compute absolute values
-    f32 absX = fabsf(x);
-    f32 absY = fabsf(y);
+    f32 absX = sl_absf(x);
+    f32 absY = sl_absf(y);
 
     // 3. Polynomial approximation
     f32 minVal = (absX < absY) ? absX : absY;

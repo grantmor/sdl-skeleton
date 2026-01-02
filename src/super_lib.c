@@ -8,7 +8,6 @@
 #include "types.h"
 
 // *** Memory ***
-
 typedef struct {
 	usize capacity;
 	usize used;
@@ -67,4 +66,35 @@ ArenaAllocator* arena_reset(ArenaAllocator* arena)
 void arena_free(ArenaAllocator* arena)
 {
 	SDL_free(arena->data);
+}
+
+// FIXME: Placeholders, make these fast (probably branchless)
+// Math
+i64 sl_absi(i64 i)
+{
+	if (i>0) return i;
+	if (i<0) return i * -1;
+	return 0;
+}
+
+f32 sl_absf(f32 f)
+{
+	// FIXME: Need to look into float innacuracy here
+	if (f>0) return f;
+	if (f<0) return f * -1;
+	return 0;
+}
+
+i64 sl_mini(i64 a, i64 b)
+{
+	if (a < b) return a;
+	if (b < a) return b;
+	return a;
+}
+
+i64 sl_maxi(i64 a, i64 b)
+{
+	if (a > b) return a;
+	if (b > a) return b;
+	return a;
 }

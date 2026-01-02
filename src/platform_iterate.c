@@ -13,7 +13,6 @@
 #include "audio.h"
 #include "game_update.h"
 #include "platform_sdl.h"
-#include "super_lib.c"
 
 #ifdef __EMSCRIPTEN__
 #include "game_update.c"  // Make sure this file is compiled into the TU
@@ -23,7 +22,6 @@ typedef void (*game_step_fn)(AppState* as);
 static game_step_fn game_step_ptr = NULL;
 static void* game_lib = NULL;
 static u64 last_game_reload = 0;
-
 
 bool should_reload_game()
 {
@@ -117,8 +115,6 @@ void platform_reload_game(void)
 
     SDL_Log("Successfully reloaded game_update.so");
 }
-
-
 
 void platform_render(AppState* as)
 {
