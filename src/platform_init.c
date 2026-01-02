@@ -61,6 +61,12 @@ SDL_AppResult platform_init(void** appstate)
 	}
 	*/
 
+	// Test Logging
+	platform_trace("trace test");
+	platform_info("info test");
+	platform_warn("warn test");
+	platform_error("error test");
+
 	AppState* as = (AppState*) SDL_calloc(1, sizeof(AppState));
 	//TODO: error handling
 

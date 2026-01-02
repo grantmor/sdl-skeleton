@@ -9,6 +9,68 @@
 #include "platform_quit.c"
 
 //FIXME: Swap out (most) SDL_Log()s for SDL_LogDebug()s
+ void platform_log(char* message, LogType log_type)
+{
+	static char* color_table[TEXT_COLOR_COUNT] =
+	{
+		"\x1b[30m", // TEXT_COLOR_BLACK
+		"\x1b[31m", // TEXT_COLOR_RED
+		"\x1b[32m", // TEXT_COLOR_GREEN
+		"\x1b[33m", // TEXT_COLOR_YELLOW
+		"\x1b[34m", // TEXT_COLOR_BLUE
+		"\x1b[35m", // TEXT_COLOR_MAGENTA
+		"\x1b[36m", // TEXT_COLOR_CYAN
+		"\x1b[37m" // TEXT_COLOR_WHITE
+	};
+
+	char* text_color_code;
+	char* log_type_text;
+	char* text_color_white = color_table[TEXT_COLOR_WHITE];
+	char* new_line = "\n";
+
+	switch (log_type)
+	{
+		case LOG_TYPE_TRACE:
+			text_color_code = color_table[TEXT_COLOR_WHITE];		
+			log_type_text = "TRACE: ";
+			break;
+		case LOG_TYPE_INFO:
+			text_color_code = color_table[TEXT_COLOR_GREEN];		
+			log_type_text = "INFO: ";
+			break;
+		case LOG_TYPE_WARN:
+			text_color_code = color_table[TEXT_COLOR_YELLOW];		
+			log_type_text = "WARNING: ";
+			break;
+		case LOG_TYPE_ERROR:
+			text_color_code = color_table[TEXT_COLOR_RED];		
+			log_type_text = "ERROR: ";
+			break;
+	}
+	
+	// SDL_Log("%s%s%s%s \033[0m", text_color_code, log_type_text, message, new_line);
+	SDL_Log("%s%s%s%s%s \033[0m", text_color_code, log_type_text, text_color_white, message, new_line);
+}
+
+void platform_trace(char* message)
+{
+	platform_log(message, LOG_TYPE_TRACE);
+}
+
+void platform_info(char* message)
+{
+	platform_log(message, LOG_TYPE_INFO);
+}
+
+void platform_warn(char* message)
+{
+	platform_log(message, LOG_TYPE_WARN);
+}
+
+void platform_error(char* message)
+{
+	platform_log(message, LOG_TYPE_ERROR);
+}
 
 i64 platform_file_timestamp_get(char* file)
 {
@@ -16,7 +78,7 @@ i64 platform_file_timestamp_get(char* file)
 	if (!SDL_GetPathInfo(file, &path_info))
 	{
 		#ifndef __EMSCRIPTEN__
-		SDL_Log("Could not get timestamp for file!");	
+		SDL_Log("Could not get timestamp for file because we're on the web!");	
 		#endif
 		return -1;
 	}

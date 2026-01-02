@@ -309,7 +309,8 @@ f32 stick_dir_right(ControllerState* cs)
 	return SDL_atan2f
 	(
 		deadzone(cs, AXIS_RIGHTX) / AXIS_MAX,
-		deadzone(cs, AXIS_RIGHTY) / AXIS_MAX);
+		deadzone(cs, AXIS_RIGHTY) / AXIS_MAX
+	);
 }
 
 f32 stick_mag_left(ControllerState* cs)

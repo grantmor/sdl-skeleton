@@ -10,6 +10,25 @@
 
 #include "super_lib.c"
 
+typedef enum {
+	TEXT_COLOR_BLACK,
+	TEXT_COLOR_RED,
+	TEXT_COLOR_GREEN,
+	TEXT_COLOR_YELLOW,
+	TEXT_COLOR_BLUE,
+	TEXT_COLOR_MAGENTA,
+	TEXT_COLOR_CYAN,
+	TEXT_COLOR_WHITE,
+	TEXT_COLOR_COUNT
+} TextColor;
+
+typedef enum {
+	LOG_TYPE_TRACE,
+	LOG_TYPE_INFO,
+	LOG_TYPE_WARN,
+	LOG_TYPE_ERROR
+} LogType;
+
 typedef struct {
 	f64 last_time;
 	f64 cur_time;
@@ -69,3 +88,13 @@ i64 platform_file_timestamp_get(char* file);
 void platform_file_load();
 
 void platform_sprite_atlas_load(SDL_Renderer* renderer, SpriteAtlas* atlas);
+
+void platform_log(char* message, LogType log_type);
+
+void platform_trace(char* message);
+
+void platform_info(char* message);
+
+void platform_warn(char* message);
+
+void platform_error(char* message);
