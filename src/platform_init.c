@@ -14,9 +14,14 @@
 #include <SDL3/SDL_timer.h>
 #include <wchar.h>
 
+#include <stdarg.h>
+
 #include "audio.h"
+#include "super_lib.h"
 #include "types.h"
+#include "super_lib.c"
 #include "platform_sdl.h"
+
 
 static const char RES_DIR[] = "res";
 static const char IMG_DIR[] = "image";
@@ -61,13 +66,66 @@ SDL_AppResult platform_init(void** appstate)
 	}
 	*/
 
+	AppState* as = (AppState*) SDL_calloc(1, sizeof(AppState));
 	// Test Logging
 	platform_trace("trace test");
 	platform_info("info test");
 	platform_warn("warn test");
 	platform_error("error test");
 
-	AppState* as = (AppState*) SDL_calloc(1, sizeof(AppState));
+	u64 arena_cap = 256;
+	// u8 backing_buffer[arena_cap];
+	Arena arena = arena_alloc_make(as->test_arena, arena_cap);
+	Arena scratch = arena_alloc_make(as->test_arena, arena_cap);
+
+	MemoryContext memctx = (MemoryContext) {.arena = &arena, .scratch = &scratch};
+	SDL_Log("context created");
+
+	/*
+	SDL_Log("arena.used: %d", arena.used);
+	SDL_Log("arena.capacity: %d", arena.capacity);
+	u8* zero_zone = arena_alloc(&arena, 8);
+	SDL_Log("arena.used: %d", arena.used);
+	SDL_Log("arena.capacity: %d", arena.capacity);
+	u8* one_zone = arena_alloc(&arena, 8);
+
+	for (usize b=0; b<8; b++)
+	{
+		zero_zone[b] = 0;
+	}
+
+	for (usize b=arena.used; b<arena.used+8; b++)
+	{
+		zero_zone[b] = 1;
+	}
+
+	for (u64 b=0; b<arena_cap; b++)
+	{
+		SDL_Log("%d", backing_buffer[b]);
+	}
+	*/
+
+	// String a = str_make(arena, "test_a");
+	// String b = str_make(&arena, "test_b");
+	// platform_warn(str_to_cstring(&arena, a));
+	// platform_warn(str_to_cstring(&arena, b));
+
+	// String c = str_concat(&arena, a, b);
+	// platform_warn(str_to_cstring(&arena, c));
+
+	// Test str
+	// platform_info(str_put_2_c(&arena, "testklasdjfkljasdkl;asdj_a ", "test_jklasdjfklasdj")); 
+
+	platform_error(str_to_cstring(&memctx, str_put(&memctx, 3, "stringa", "stringb", "stringc")));
+	SDL_Log("platform_error run");
+
+	/*
+	for (usize b=0; b<arena_cap; b++)
+	{
+		SDL_Log("%c", backing_buffer[b]);	
+	}
+	*/
+
 	//TODO: error handling
 
 	// Video

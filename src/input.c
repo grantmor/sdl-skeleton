@@ -8,8 +8,8 @@
 
 #include "types.h"
 #include "platform_sdl.h"
-
 #include "input.h"
+#include "super_lib.c"
 
 //TODO: Add features of mapping keys and gamepad controls to "Actions"
 
@@ -172,7 +172,7 @@ void platform_gamepad_axis_state
 {
 	i32 value = SDL_GetGamepadAxis(gp, axis);
 	i8 sign = (value > 0) - (value < 0);
-	i32 magnitude = sl_mini(sl_absi(value), SDL_MAX_SINT16);
+	i32 magnitude = mini(absi(value), SDL_MAX_SINT16);
 	i16 clamped = (i16) (magnitude * sign);
 
 	// TODO: Calculate and store relative later?
@@ -270,7 +270,7 @@ i16 deadzone(ControllerState* cs, ControllerAxisMap axis)
 	i16 val = cs->axis[axis];
 	i16 deadzone = cs->deadzone[axis];
 
-	if (sl_absi(val) < deadzone)
+	if (absi(val) < deadzone)
 	{
 		return 0;
 	}
@@ -323,8 +323,8 @@ f32 stick_mag_left(ControllerState* cs)
     y = deadzone(cs, AXIS_LEFTY) / AXIS_MAX;
 
     // 2. Compute absolute values
-    f32 absX = sl_absf(x);
-    f32 absY = sl_absf(y);
+    f32 absX = absf(x);
+    f32 absY = absf(y);
 
     // 3. Polynomial approximation
     f32 minVal = (absX < absY) ? absX : absY;
@@ -347,8 +347,8 @@ f32 stick_mag_right(ControllerState* cs)
     y = deadzone(cs, AXIS_RIGHTY) / AXIS_MAX;
 
     // 2. Compute absolute values
-    f32 absX = sl_absf(x);
-    f32 absY = sl_absf(y);
+    f32 absX = absf(x);
+    f32 absY = absf(y);
 
     // 3. Polynomial approximation
     f32 minVal = (absX < absY) ? absX : absY;

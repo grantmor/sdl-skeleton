@@ -19,6 +19,7 @@ typedef float f32;
 typedef double f64;
 
 typedef bool b8;
+typedef char c8;
 
 typedef size_t usize;
 

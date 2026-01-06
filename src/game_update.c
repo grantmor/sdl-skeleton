@@ -8,6 +8,7 @@
 #include "input.h"
 #include "platform_sdl.h"
 #include "input.c"
+#include "super_lib.h"
 
 void game_update(AppState* as)
 {

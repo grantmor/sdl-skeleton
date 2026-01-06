@@ -78,7 +78,7 @@ i64 platform_file_timestamp_get(char* file)
 	if (!SDL_GetPathInfo(file, &path_info))
 	{
 		#ifndef __EMSCRIPTEN__
-		SDL_Log("Could not get timestamp for file because we're on the web!");	
+		platform_trace("Could not get timestamp for file because we're on the web!");	
 		#endif
 		return -1;
 	}

@@ -8,7 +8,8 @@
 #include "audio.h"
 #include "input.h"
 
-#include "super_lib.c"
+#include "super_lib.h"
+// #include "super_lib.c"
 
 typedef enum {
 	TEXT_COLOR_BLACK,
@@ -77,9 +78,12 @@ typedef struct {
 	// Sound
 	SoundManager sound_manager;
 
-	// Resources
-	// TODO: This obviously shouldn't be naked in global state
-	//SoundClip* sound_clip;
+	// Memory
+	u8 test_arena[1 * 1024 * 1024]; 
+	u8 test_scratch[1 * 1024 * 1024]; 
+
+	// Arena* arena = arena_make();
+	// Arena* scratch = {};
 } AppState;
 
 // *** File IO ***
