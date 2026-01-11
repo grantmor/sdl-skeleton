@@ -11,6 +11,12 @@
 #include "super_lib.h"
 // #include "super_lib.c"
 
+#define ARENA_APP_SIZE MB(8)
+#define SCRATCH_APP_SIZE MB(8)
+
+#define ARENA_FRAME_SIZE MB(256)
+#define SCRATCH_FRAME_SIZE MB(256)
+
 typedef enum {
 	TEXT_COLOR_BLACK,
 	TEXT_COLOR_RED,
@@ -63,6 +69,20 @@ typedef struct {
 } SpriteAtlas;
 
 typedef struct {
+	Arena app_arena;
+	Arena app_scratch;
+
+	Arena frame_arena;
+	Arena frame_scratch;
+
+	u8 app_arena_buffer[ARENA_APP_SIZE]; 
+	u8 app_scratch_buffer[SCRATCH_APP_SIZE]; 
+
+	u8 frame_arena_buffer[ARENA_FRAME_SIZE]; 
+	u8 frame_scratch_buffer[SCRATCH_FRAME_SIZE];
+} Memory;
+
+typedef struct {
 	SDL_Window* window;
 	SDL_Renderer* renderer;
 
@@ -79,11 +99,7 @@ typedef struct {
 	SoundManager sound_manager;
 
 	// Memory
-	u8 test_arena[1 * 1024 * 1024]; 
-	u8 test_scratch[1 * 1024 * 1024]; 
-
-	// Arena* arena = arena_make();
-	// Arena* scratch = {};
+	Memory memory;
 } AppState;
 
 // *** File IO ***

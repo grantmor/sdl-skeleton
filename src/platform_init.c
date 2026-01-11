@@ -21,7 +21,6 @@
 #include "super_lib.c"
 #include "platform_sdl.h"
 
-
 static const char RES_DIR[] = "res";
 static const char IMG_DIR[] = "image";
 static const char SFX_DIR[] = "sound";
@@ -68,24 +67,18 @@ SDL_AppResult platform_init(void** appstate)
 	AppState* as = (AppState*) SDL_calloc(1, sizeof(AppState));
 
 	// Test Logging
-	/*
-	platform_trace("trace test");
-	platform_info("info test");
-	platform_warn("warn test");
-	platform_error("error test");
-	*/
-
 	TRACE("trace test");
 	INFO("info text");
 	WARN("warn test");
 	ERROR("error test");
 
-	u64 arena_cap = 256;
+	Arena app_arena = arena_alloc_make(as->memory.app_arena_buffer, ARENA_APP_SIZE);
+	Arena app_scratch = arena_alloc_make(as->memory.app_scratch_buffer, SCRATCH_APP_SIZE);
 
-	Arena arena = arena_alloc_make(as->test_arena, arena_cap);
-	Arena scratch = arena_alloc_make(as->test_arena, arena_cap);
+	Arena frame_arena = arena_alloc_make(as->memory.frame_arena_buffer, ARENA_APP_SIZE);
+	Arena frame_scratch = arena_alloc_make(as->memory.app_scratch_buffer, SCRATCH_APP_SIZE);
 
-	MemoryContext mctx = (MemoryContext) {.arena = &arena, .scratch = &scratch};
+	MemoryContext mctx = (MemoryContext) {.arena = &app_arena, .scratch = &app_scratch};
 
 	// Video
 	if (!SDL_CreateWindowAndRenderer("SDL3 Skeleton", 1280, 720, SDL_WINDOW_RESIZABLE, &as->window, &as->renderer))
@@ -95,7 +88,6 @@ SDL_AppResult platform_init(void** appstate)
 	}
 
 	SDL_SetRenderLogicalPresentation(as->renderer, 640, 360, SDL_LOGICAL_PRESENTATION_LETTERBOX);
-
 
 	// Input
 	// Pump events to ensure gamepad can be accessed
