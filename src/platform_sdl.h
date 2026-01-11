@@ -95,10 +95,16 @@ void platform_sprite_atlas_load(SDL_Renderer* renderer, SpriteAtlas* atlas);
 
 void platform_log(char* message, LogType log_type);
 
-void platform_trace(char* message);
+void platform_trace(const char* fmt, ...);
 
-void platform_info(char* message);
+void platform_info(const char* fmt, ...);
 
-void platform_warn(char* message);
+void platform_warn(const char* fmt, ...);
 
-void platform_error(char* message);
+void platform_error(const char* fmt, ...);
+
+// Convenience macros for clean callsites
+#define TRACE(...) platform_trace(__VA_ARGS__)
+#define INFO(...)  platform_info(__VA_ARGS__)
+#define WARN(...)  platform_warn(__VA_ARGS__)
+#define ERROR(...) platform_error(__VA_ARGS__)

@@ -52,25 +52,51 @@
 	SDL_Log("%s%s%s%s%s \033[0m", text_color_code, log_type_text, text_color_white, message, new_line);
 }
 
-void platform_trace(char* message)
+// FIXME: Accepting dependence on libc for a while to get this thing ready to use
+void platform_trace(const char* fmt, ...)
 {
-	platform_log(message, LOG_TYPE_TRACE);
+    char buf[1024];
+    va_list args;
+    va_start(args, fmt);
+    vsnprintf(buf, sizeof(buf), fmt, args);
+    va_end(args);
+
+    platform_log(buf, LOG_TYPE_TRACE);
 }
 
-void platform_info(char* message)
+void platform_info(const char* fmt, ...)
 {
-	platform_log(message, LOG_TYPE_INFO);
+    char buf[1024];
+    va_list args;
+    va_start(args, fmt);
+    vsnprintf(buf, sizeof(buf), fmt, args);
+    va_end(args);
+
+    platform_log(buf, LOG_TYPE_INFO);
 }
 
-void platform_warn(char* message)
+void platform_warn(const char* fmt, ...)
 {
-	platform_log(message, LOG_TYPE_WARN);
+    char buf[1024];
+    va_list args;
+    va_start(args, fmt);
+    vsnprintf(buf, sizeof(buf), fmt, args);
+    va_end(args);
+
+    platform_log(buf, LOG_TYPE_WARN);
 }
 
-void platform_error(char* message)
+void platform_error(const char* fmt, ...)
 {
-	platform_log(message, LOG_TYPE_ERROR);
+    char buf[1024];
+    va_list args;
+    va_start(args, fmt);
+    vsnprintf(buf, sizeof(buf), fmt, args);
+    va_end(args);
+
+    platform_log(buf, LOG_TYPE_ERROR);
 }
+
 
 i64 platform_file_timestamp_get(char* file)
 {

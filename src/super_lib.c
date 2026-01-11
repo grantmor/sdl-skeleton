@@ -1,6 +1,8 @@
-#include "platform_sdl.h"
 #define ARENA_INIT_VAL 0xFF
+
 #include <stdarg.h>
+#include <string.h>
+#include <stdio.h>
 
 #include <SDL3/SDL_filesystem.h>
 #include <SDL3/SDL.h>
@@ -178,6 +180,109 @@ String str_put(MemoryContext* mctx, u32 count, ...)
 	arena_sub_end(scratch);
 	// SDL_Log(str_to_cstring(mctx, result));
 	return result;
+}
+
+// FIXME: rewrite this monstrosity later
+c8* str_fmt_c(MemoryContext* mctx, const c8* fmt, ...)
+{
+    c8 temp[8192];
+    usize out = 0;
+
+    va_list args;
+    va_start(args, fmt);
+
+    for (usize i = 0; fmt[i] != '\0' && out < sizeof(temp) - 1; i++)
+    {
+        if (fmt[i] != '%')
+        {
+            temp[out++] = fmt[i];
+            continue;
+        }
+
+        // %%
+        if (fmt[i + 1] == '%')
+        {
+            temp[out++] = '%';
+            i++;
+            continue;
+        }
+
+        switch (fmt[++i])
+        {
+            // C-string
+            case 'c':
+            {
+                const c8* s = va_arg(args, const c8*);
+                if (!s) s = "(null)";
+
+                while (*s && out < sizeof(temp) - 1)
+                    temp[out++] = *s++;
+            } break;
+
+            // custom String
+            case 's':
+            {
+                String str = va_arg(args, String);
+
+                usize copy_len = str.length;
+                if (out + copy_len >= sizeof(temp))
+                    copy_len = sizeof(temp) - out - 1;
+
+                memcpy(temp + out, str.text, copy_len);
+                out += copy_len;
+            } break;
+
+            // integer
+            case 'i':
+            {
+                out += snprintf(
+                    temp + out,
+                    sizeof(temp) - out,
+                    "%d",
+                    va_arg(args, int)
+                );
+            } break;
+
+            // float
+            case 'f':
+            {
+                out += snprintf(
+                    temp + out,
+                    sizeof(temp) - out,
+                    "%f",
+                    va_arg(args, double)
+                );
+            } break;
+
+            // fixed-point 16.16
+            case 'x':
+            {
+                int32_t v = va_arg(args, int32_t);
+                double f = (double)v / 65536.0;
+
+                out += snprintf(
+                    temp + out,
+                    sizeof(temp) - out,
+                    "%.4f",
+                    f
+                );
+            } break;
+
+            default:
+            {
+                // unknown specifier → copy literally
+                temp[out++] = fmt[i];
+            } break;
+        }
+    }
+
+    va_end(args);
+
+    temp[out] = '\0';
+
+    u8* result = arena_alloc(mctx->arena, out + 1);
+    memcpy(result, temp, out + 1);
+    return (c8*) result;
 }
 
 // FIXME: Placeholders, make these fast (probably branchless)
