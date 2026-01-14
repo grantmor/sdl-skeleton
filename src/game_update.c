@@ -8,7 +8,23 @@
 #include "input.h"
 #include "platform_sdl.h"
 #include "input.c"
-#include "super_lib.h"
+
+// redefine TRACE macros for the .so to use local pointer
+#undef TRACE
+#undef INFO
+#undef WARN
+#undef ERROR
+
+#define TRACE(...) g_platform->platform_trace_ptr(__VA_ARGS__)
+#define INFO(...)  g_platform->platform_info_ptr(__VA_ARGS__)
+#define WARN(...)  g_platform->platform_warn_ptr(__VA_ARGS__)
+#define ERROR(...) g_platform->platform_error_ptr(__VA_ARGS__)
+
+static PlatformAPI* g_platform = NULL;
+
+void game_init(PlatformAPI* platform) {
+    g_platform = platform;
+}
 
 void game_update(AppState* as)
 {
@@ -93,6 +109,7 @@ void platform_gamepad_update(AppState* as) {
 
 void game_step(AppState* as)
 {
+    INFO("Game Update!");
     sound_list_clear(&as->sound_manager);
 
     time_update(&as->time);

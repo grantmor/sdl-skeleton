@@ -83,6 +83,15 @@ typedef struct {
 } Memory;
 
 typedef struct {
+	void (*platform_trace_ptr) (const char* fmt, ...);
+	void (*platform_info_ptr) (const char* fmt, ...);
+	void (*platform_warn_ptr) (const char* fmt, ...);
+	void (*platform_error_ptr) (const char* fmt, ...);
+} PlatformAPI;
+
+// extern PlatformAPI* g_platform_api;
+
+typedef struct {
 	SDL_Window* window;
 	SDL_Renderer* renderer;
 
@@ -100,6 +109,9 @@ typedef struct {
 
 	// Memory
 	Memory memory;
+
+	// Pointer Table
+	PlatformAPI platform_api;
 } AppState;
 
 // *** File IO ***
@@ -120,7 +132,14 @@ void platform_warn(const char* fmt, ...);
 void platform_error(const char* fmt, ...);
 
 // Convenience macros for clean callsites
+/*
 #define TRACE(...) platform_trace(__VA_ARGS__)
 #define INFO(...)  platform_info(__VA_ARGS__)
 #define WARN(...)  platform_warn(__VA_ARGS__)
 #define ERROR(...) platform_error(__VA_ARGS__)
+*/
+
+#define TRACE(...) g_platform_api->platform_trace_ptr(__VA_ARGS__)
+#define INFO(...)  g_platform_api->platform_info_ptr(__VA_ARGS__)
+#define WARN(...)  g_platform_api->platform_warn_ptr(__VA_ARGS__)
+#define ERROR(...) g_platform_api->platform_error_ptr(__VA_ARGS__)

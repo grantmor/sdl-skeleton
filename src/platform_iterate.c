@@ -18,6 +18,7 @@
 #include "game_update.c"  // Make sure this file is compiled into the TU
 #endif
 
+typedef void (*game_init_fn)(PlatformAPI* platform);
 typedef void (*game_step_fn)(AppState* as);
 static game_step_fn game_step_ptr = NULL;
 static void* game_lib = NULL;
@@ -113,6 +114,24 @@ void platform_reload_game(void)
         return;
     }
 
+    // Testing global pointer table
+	// **Resolve and call game_init**
+    dlerror();
+    game_init_fn init_fn = (game_init_fn)dlsym(game_lib, "game_init");
+    err = dlerror();
+    if (err)
+    {
+        SDL_Log("dlsym game_init failed: %s", err);
+        dlclose(game_lib);
+        game_lib = NULL;
+        game_step_ptr = NULL;
+        return;
+    }
+
+    // Pass the platform API pointer into the game library
+    // init_fn(&g_platform_api);
+    init_fn(g_platform_api);
+    
     SDL_Log("Successfully reloaded game_update.so");
 }
 

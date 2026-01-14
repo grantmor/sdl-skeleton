@@ -66,6 +66,17 @@ SDL_AppResult platform_init(void** appstate)
 
 	AppState* as = (AppState*) SDL_calloc(1, sizeof(AppState));
 
+
+	// Function pointers for platform API
+	g_platform_api = &as->platform_api;
+	as->platform_api = (PlatformAPI)
+	{
+		.platform_trace_ptr = platform_trace,
+		.platform_info_ptr = platform_info,
+		.platform_warn_ptr = platform_warn,
+		.platform_error_ptr = platform_error,
+	};
+
 	// Test Logging
 	TRACE("trace test");
 	INFO("info text");

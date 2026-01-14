@@ -3,11 +3,14 @@
 #include <SDL3/SDL_main.h>
 
 #include "platform_sdl.h"
+
+static PlatformAPI* g_platform_api;
+
 #include "platform_iterate.c"
 #include "platform_init.c"
 #include "platform_event.c"
 #include "platform_quit.c"
-
+ 
 //FIXME: Swap out (most) SDL_Log()s for SDL_LogDebug()s
  void platform_log(char* message, LogType log_type)
 {
