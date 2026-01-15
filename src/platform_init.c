@@ -39,7 +39,7 @@ SDL_EnumerationResult load_wavs(void* userdata, const char* dir, const char* fil
 
 		if (!SDL_LoadWAV(sound.path, &sound_manager->sample_spec, &sound.data, &sound.length))
 		{
-			SDL_Log("Couldn't load wav file: %s", SDL_GetError());
+			ERROR("Couldn't load wav file: %s", SDL_GetError());
 		}
 		// TODO: Log successful load here
 
@@ -77,12 +77,6 @@ SDL_AppResult platform_init(void** appstate)
 		.platform_error_ptr = platform_error,
 	};
 
-	// Test Logging
-	TRACE("trace test");
-	INFO("info text");
-	WARN("warn test");
-	ERROR("error test");
-
 	Arena app_arena = arena_alloc_make(as->memory.app_arena_buffer, ARENA_APP_SIZE);
 	Arena app_scratch = arena_alloc_make(as->memory.app_scratch_buffer, SCRATCH_APP_SIZE);
 
@@ -94,7 +88,7 @@ SDL_AppResult platform_init(void** appstate)
 	// Video
 	if (!SDL_CreateWindowAndRenderer("SDL3 Skeleton", 1280, 720, SDL_WINDOW_RESIZABLE, &as->window, &as->renderer))
 	{
-		SDL_Log("Failed to create window/renderer: %s.", SDL_GetError());
+		ERROR("Failed to create window/renderer: %s.", SDL_GetError());
 		return SDL_APP_FAILURE;		
 	}
 
@@ -113,11 +107,11 @@ SDL_AppResult platform_init(void** appstate)
 		SDL_Gamepad* controller = SDL_OpenGamepad(ids[0]);
 		if (!controller)
 		{
-			SDL_Log("Failed to open gamepad: %s\n", SDL_GetError());
+			ERROR("Failed to open gamepad: %s\n", SDL_GetError());
 		}
 		else
 		{
-			SDL_Log("Gamepad Name: %s\n", SDL_GetGamepadName(controller));
+			INFO("Gamepad Name: %s\n", SDL_GetGamepadName(controller));
 			as->platform_input.platform_gamepad = controller;
 		}
 	}
@@ -169,7 +163,7 @@ SDL_AppResult platform_init(void** appstate)
 	SDL_AudioDeviceID device = SDL_OpenAudioDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &as->sound_manager.system_spec);
 	if (!device)
 	{
-		SDL_Log("Failed to initialize audio device: %s", SDL_GetError());
+		ERROR("Failed to initialize audio device: %s", SDL_GetError());
 	}
 	as->sound_manager.device_id = device;
 
@@ -182,7 +176,7 @@ SDL_AppResult platform_init(void** appstate)
 
 		if (!stream)
 		{
-			SDL_Log("Could not open audio device: %s", SDL_GetError());
+			ERROR("Could not open audio device: %s", SDL_GetError());
 			//TODO: Crash here?
 		}
 	}

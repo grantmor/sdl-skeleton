@@ -1,13 +1,10 @@
-// #pragma once
-
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_init.h>
 #include <SDL3/SDL_timer.h>
 
-#include "audio.h"
-#include "input.h"
 #include "platform_sdl.h"
-#include "input.c"
+
+static PlatformAPI* g_platform = NULL;
 
 // redefine TRACE macros for the .so to use local pointer
 #undef TRACE
@@ -20,7 +17,9 @@
 #define WARN(...)  g_platform->platform_warn_ptr(__VA_ARGS__)
 #define ERROR(...) g_platform->platform_error_ptr(__VA_ARGS__)
 
-static PlatformAPI* g_platform = NULL;
+#include "audio.h"
+#include "input.h"
+#include "input.c"
 
 void game_init(PlatformAPI* platform) {
     g_platform = platform;
@@ -57,7 +56,6 @@ void audio_list_build(AppState* as, GameInput* game_input)
     KeyboardState* ks = &game_input->keyboard_state;
 
 	// Test Audio
-	//SDL_Log("bytes queued: %i", SDL_GetAudioStreamQueued(stream));
 	if (key_pressed(ks, KEY_Q)) 
 	{
 		sound_list_add(sound_man, SFX_COIN);
@@ -82,7 +80,7 @@ void time_update(Time* time)
 
 	// Don't log every frame
     if (time->frame_counter % 2000 == 0)
-        SDL_Log("FPS: %0.0f", time->fps_avg);
+        TRACE("FPS: %0.0f", time->fps_avg);
 
     // Update time for next frames 
     time->dt = frametime;
@@ -101,7 +99,7 @@ void platform_gamepad_update(AppState* as) {
     if (num_gamepads > 0 && as->platform_input.platform_gamepad == NULL) {
         SDL_Gamepad* controller = SDL_OpenGamepad(ids[0]);
         if (controller) {
-            SDL_Log("Opened gamepad: %s", SDL_GetGamepadName(controller));
+            INFO("Opened gamepad: %s", SDL_GetGamepadName(controller));
             as->platform_input.platform_gamepad = controller;
         }
     }
@@ -109,7 +107,7 @@ void platform_gamepad_update(AppState* as) {
 
 void game_step(AppState* as)
 {
-    INFO("Game Update!");
+    // game_init(&as->platform_api);
     sound_list_clear(&as->sound_manager);
 
     time_update(&as->time);
@@ -123,4 +121,3 @@ void game_step(AppState* as)
     render_list_build(as);
     audio_list_build(as, &as->game_input);
 }
-

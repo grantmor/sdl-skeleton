@@ -84,11 +84,11 @@ void platform_reload_game(void)
     char copied_lib[64];
     SDL_snprintf(copied_lib, sizeof(copied_lib), "./build/native/game_update_load_%llu.so", (unsigned long long) SDL_GetTicks());
 
-    SDL_Log("Copying %s -> %s", compiled_lib, copied_lib);
+    INFO("Copying %s -> %s", compiled_lib, copied_lib);
 
     if (!platform_file_copy(compiled_lib, copied_lib))
     {
-        SDL_Log("Failed to copy game library: %s", SDL_GetError());
+        WARN("Failed to copy game library: %s", SDL_GetError());
         return;
     }
 
@@ -97,7 +97,7 @@ void platform_reload_game(void)
     if (!game_lib)
     {
         const char* err = dlerror();
-        SDL_Log("dlopen failed: %s", err ? err : "unknown");
+        WARN("dlopen failed: %s", err ? err : "unknown");
         return;
     }
 
@@ -107,7 +107,7 @@ void platform_reload_game(void)
     const char* err = dlerror();
     if (err)
     {
-        SDL_Log("dlsym failed: %s", err);
+        WARN("dlsym failed: %s", err);
         dlclose(game_lib);
         game_lib = NULL;
         game_step_ptr = NULL;
@@ -121,7 +121,7 @@ void platform_reload_game(void)
     err = dlerror();
     if (err)
     {
-        SDL_Log("dlsym game_init failed: %s", err);
+        WARN("dlsym game_init failed: %s", err);
         dlclose(game_lib);
         game_lib = NULL;
         game_step_ptr = NULL;
@@ -132,7 +132,7 @@ void platform_reload_game(void)
     // init_fn(&g_platform_api);
     init_fn(g_platform_api);
     
-    SDL_Log("Successfully reloaded game_update.so");
+    INFO("Successfully reloaded game_update.so");
 }
 
 void platform_render(AppState* as)
@@ -182,7 +182,6 @@ void sound_clip_play(SoundManager* sound_man, SoundClip* clip)
 
 void platform_audio(SoundManager* sound_man)
 {
-	// SDL_Log("platform_audio() entered");
 	for (u32 s=0; s<sound_man->num_sounds_to_play; s++)
 	{
 		if (sound_man->playing_sounds[s] != SFX_NO_SOUND)

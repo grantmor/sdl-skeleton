@@ -4,14 +4,12 @@
 
 #include "platform_sdl.h"
 
-static PlatformAPI* g_platform_api;
 
 #include "platform_iterate.c"
 #include "platform_init.c"
 #include "platform_event.c"
 #include "platform_quit.c"
  
-//FIXME: Swap out (most) SDL_Log()s for SDL_LogDebug()s
  void platform_log(char* message, LogType log_type)
 {
 	static char* color_table[TEXT_COLOR_COUNT] =
@@ -117,7 +115,7 @@ i64 platform_file_timestamp_get(char* file)
 
 void platform_sprite_atlas_load(SDL_Renderer* renderer, SpriteAtlas* atlas)
 {
-	SDL_Log("atlas path: %s", atlas->path);
+	INFO("atlas path: %s", atlas->path);
 	if (atlas->atlas)
 	{
 		SDL_DestroyTexture(atlas->atlas);
@@ -126,7 +124,7 @@ void platform_sprite_atlas_load(SDL_Renderer* renderer, SpriteAtlas* atlas)
 	SDL_Surface* sprite_atlas_surf = SDL_LoadBMP(atlas->path);
 	SDL_Texture* sprite_atlas_tex = SDL_CreateTextureFromSurface(renderer, sprite_atlas_surf);
 	if (!sprite_atlas_tex) {
-	    SDL_Log("Failed to create texture: %s", SDL_GetError());
+	    ERROR("Failed to create texture: %s", SDL_GetError());
 	}
 	else
 	{

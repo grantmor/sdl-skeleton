@@ -76,7 +76,7 @@ void platform_gamepad_button_state_analog
 			axis = SDL_GAMEPAD_AXIS_RIGHT_TRIGGER;
 			break;
 		default:
-			SDL_Log("ERROR: Digital button passed to platform_gamepad_button_state_analog!");
+			ERROR("Digital button passed to platform_gamepad_button_state_analog!");
 	}
 
 	b8 prev_button_state = state_prev->button[button];
@@ -416,142 +416,142 @@ b8 mouse_button_idle(MouseState* ms, MouseButtonMap bs)
 
 void game_input(GameInput* game_input) 
 {
-
 	ControllerState* cs = &game_input->controller_state;
-/*
+
 	// Face Buttons
-	if (button_pressed(cs, BUTTON_NORTH)) SDL_Log("North Button Pressed");
-	if (button_pressed(cs, BUTTON_SOUTH)) SDL_Log("South Button Pressed");
-	if (button_pressed(cs, BUTTON_EAST)) SDL_Log("East Button Pressed");
-	if (button_pressed(cs, BUTTON_WEST)) SDL_Log("West Button Pressed");
+	if (button_pressed(cs, BUTTON_NORTH)) TRACE("North Button Pressed");
+	/*
+	if (button_pressed(cs, BUTTON_SOUTH)) TRACE("South Button Pressed");
+	if (button_pressed(cs, BUTTON_EAST)) TRACE("East Button Pressed");
+	if (button_pressed(cs, BUTTON_WEST)) TRACE("West Button Pressed");
 
 	// DPAD
-	if (button_pressed(cs, DPAD_UP)) SDL_Log("DPAD Up Pressed");
-	if (button_pressed(cs, DPAD_DOWN)) SDL_Log("DPAD Down Pressed");
-	if (button_pressed(cs, DPAD_LEFT)) SDL_Log("DPAD Left Pressed");
-	if (button_pressed(cs, DPAD_RIGHT)) SDL_Log("DPAD Right Pressed");
+	if (button_pressed(cs, DPAD_UP)) TRACE("DPAD Up Pressed");
+	if (button_pressed(cs, DPAD_DOWN)) TRACE("DPAD Down Pressed");
+	if (button_pressed(cs, DPAD_LEFT)) TRACE("DPAD Left Pressed");
+	if (button_pressed(cs, DPAD_RIGHT)) TRACE("DPAD Right Pressed");
 
 	// Shoulder
-	if (button_pressed(cs, SHOULDER_LEFT)) SDL_Log("Left Shoulder Button Pressed");
-	if (button_pressed(cs, SHOULDER_RIGHT)) SDL_Log("Right Shoulder Button Pressed");
+	if (button_pressed(cs, SHOULDER_LEFT)) TRACE("Left Shoulder Button Pressed");
+	if (button_pressed(cs, SHOULDER_RIGHT)) TRACE("Right Shoulder Button Pressed");
 
 	// Triggers
-	if (button_pressed(cs, TRIGGER_LEFT)) SDL_Log("Left Trigger Button Pressed");
-	if (button_pressed(cs, TRIGGER_RIGHT)) SDL_Log("Right Trigger Button Pressed");
+	if (button_pressed(cs, TRIGGER_LEFT)) TRACE("Left Trigger Button Pressed");
+	if (button_pressed(cs, TRIGGER_RIGHT)) TRACE("Right Trigger Button Pressed");
 
 	// Sticks
-	if (button_pressed(cs, CLICK_LEFT)) SDL_Log("Left Stick Button Pressed");
-	if (button_pressed(cs, CLICK_RIGHT)) SDL_Log("Right Stick Button Pressed");
+	if (button_pressed(cs, CLICK_LEFT)) TRACE("Left Stick Button Pressed");
+	if (button_pressed(cs, CLICK_RIGHT)) TRACE("Right Stick Button Pressed");
 
 	// System
-	if (button_pressed(cs, BUTTON_START)) SDL_Log("Start Button Pressed");
-	if (button_pressed(cs, BUTTON_SELECT)) SDL_Log("Select Button Pressed");
+	if (button_pressed(cs, BUTTON_START)) TRACE("Start Button Pressed");
+	if (button_pressed(cs, BUTTON_SELECT)) TRACE("Select Button Pressed");
 
-	SDL_Log("Left Stick Vector x: %f", stick_vec_left(cs).x); 
-	SDL_Log("Left Stick Vector y: %f", stick_vec_left(cs).y); 
+	TRACE("Left Stick Vector x: %f", stick_vec_left(cs).x); 
+	TRACE("Left Stick Vector y: %f", stick_vec_left(cs).y); 
 
-	SDL_Log("Left Stick Dir: %f", stick_dir_left(cs));
-	SDL_Log("Left Stick Mag: %f", stick_mag_left(cs));
+	TRACE("Left Stick Dir: %f", stick_dir_left(cs));
+	TRACE("Left Stick Mag: %f", stick_mag_left(cs));
 
-	SDL_Log("Right Stick Vector x: %f", stick_vec_right(cs).x);
-	SDL_Log("Right Stick Vector y: %f", stick_vec_right(cs).y);
+	TRACE("Right Stick Vector x: %f", stick_vec_right(cs).x);
+	TRACE("Right Stick Vector y: %f", stick_vec_right(cs).y);
 
-	SDL_Log("Right Stick Dir: %f", stick_dir_right(cs));
-	SDL_Log("Right Stick Mag: %f", stick_mag_right(cs));
+	TRACE("Right Stick Dir: %f", stick_dir_right(cs));
+	TRACE("Right Stick Mag: %f", stick_mag_right(cs));
 
-	SDL_Log("Left Trigger Mag: %f", trigger_mag_left(cs));
-	SDL_Log("Right Trigger Mag: %f", trigger_mag_right(cs));
+	TRACE("Left Trigger Mag: %f", trigger_mag_left(cs));
+	TRACE("Right Trigger Mag: %f", trigger_mag_right(cs));
 
 	// Controller Axes
-	SDL_Log("Axis 0:%i", cs->axis[0]);
-	SDL_Log("Axis 1:%i", cs->axis[1]);
-	SDL_Log("Axis 2:%i", cs->axis[2]);
-	SDL_Log("Axis 3:%i", cs->axis[3]);
-	SDL_Log("Axis 4:%i", cs->axis[4]);
-	SDL_Log("Axis 5:%i", cs->axis[5]);
+	TRACE("Axis 0:%i", cs->axis[0]);
+	TRACE("Axis 1:%i", cs->axis[1]);
+	TRACE("Axis 2:%i", cs->axis[2]);
+	TRACE("Axis 3:%i", cs->axis[3]);
+	TRACE("Axis 4:%i", cs->axis[4]);
+	TRACE("Axis 5:%i", cs->axis[5]);
 
 	// Keyboard
 	KeyboardState* ks = &game_input->keyboard_state;
 
-	if (key_pressed(ks, KEY_0)) SDL_Log("0 key pressed");
-	if (key_pressed(ks, KEY_1)) SDL_Log("1 key pressed");
-	if (key_pressed(ks, KEY_2)) SDL_Log("2 key pressed");
-	if (key_pressed(ks, KEY_3)) SDL_Log("3 key pressed");
-	if (key_pressed(ks, KEY_4)) SDL_Log("4 key pressed");
-	if (key_pressed(ks, KEY_5)) SDL_Log("5 key pressed");
-	if (key_pressed(ks, KEY_6)) SDL_Log("6 key pressed");
-	if (key_pressed(ks, KEY_7)) SDL_Log("7 key pressed");
-	if (key_pressed(ks, KEY_8)) SDL_Log("8 key pressed");
-	if (key_pressed(ks, KEY_9)) SDL_Log("9 key pressed");
+	if (key_pressed(ks, KEY_0)) TRACE("0 key pressed");
+	if (key_pressed(ks, KEY_1)) TRACE("1 key pressed");
+	if (key_pressed(ks, KEY_2)) TRACE("2 key pressed");
+	if (key_pressed(ks, KEY_3)) TRACE("3 key pressed");
+	if (key_pressed(ks, KEY_4)) TRACE("4 key pressed");
+	if (key_pressed(ks, KEY_5)) TRACE("5 key pressed");
+	if (key_pressed(ks, KEY_6)) TRACE("6 key pressed");
+	if (key_pressed(ks, KEY_7)) TRACE("7 key pressed");
+	if (key_pressed(ks, KEY_8)) TRACE("8 key pressed");
+	if (key_pressed(ks, KEY_9)) TRACE("9 key pressed");
 
-	if (key_pressed(ks, KEY_A)) SDL_Log("A key pressed");
-	if (key_pressed(ks, KEY_B)) SDL_Log("B key pressed");
-	if (key_pressed(ks, KEY_C)) SDL_Log("C key pressed");
-	if (key_pressed(ks, KEY_D)) SDL_Log("D key pressed");
-	if (key_pressed(ks, KEY_E)) SDL_Log("E key pressed");
-	if (key_pressed(ks, KEY_F)) SDL_Log("F key pressed");
-	if (key_pressed(ks, KEY_G)) SDL_Log("G key pressed");
-	if (key_pressed(ks, KEY_H)) SDL_Log("H key pressed");
-	if (key_pressed(ks, KEY_I)) SDL_Log("I key pressed");
-	if (key_pressed(ks, KEY_J)) SDL_Log("J key pressed");
-	if (key_pressed(ks, KEY_K)) SDL_Log("K key pressed");
-	if (key_pressed(ks, KEY_L)) SDL_Log("L key pressed");
-	if (key_pressed(ks, KEY_M)) SDL_Log("M key pressed");
-	if (key_pressed(ks, KEY_N)) SDL_Log("N key pressed");
-	if (key_pressed(ks, KEY_O)) SDL_Log("O key pressed");
-	if (key_pressed(ks, KEY_P)) SDL_Log("P key pressed");
-	if (key_pressed(ks, KEY_Q)) SDL_Log("Q key pressed");
-	if (key_pressed(ks, KEY_R)) SDL_Log("R key pressed");
-	if (key_pressed(ks, KEY_S)) SDL_Log("S key pressed");
-	if (key_pressed(ks, KEY_T)) SDL_Log("T key pressed");
-	if (key_pressed(ks, KEY_U)) SDL_Log("U key pressed");
-	if (key_pressed(ks, KEY_V)) SDL_Log("V key pressed");
-	if (key_pressed(ks, KEY_W)) SDL_Log("W key pressed");
-	if (key_pressed(ks, KEY_X)) SDL_Log("X key pressed");
-	if (key_pressed(ks, KEY_Y)) SDL_Log("Y key pressed");
-	if (key_pressed(ks, KEY_Z)) SDL_Log("Z key pressed");
+	if (key_pressed(ks, KEY_A)) TRACE("A key pressed");
+	if (key_pressed(ks, KEY_B)) TRACE("B key pressed");
+	if (key_pressed(ks, KEY_C)) TRACE("C key pressed");
+	if (key_pressed(ks, KEY_D)) TRACE("D key pressed");
+	if (key_pressed(ks, KEY_E)) TRACE("E key pressed");
+	if (key_pressed(ks, KEY_F)) TRACE("F key pressed");
+	if (key_pressed(ks, KEY_G)) TRACE("G key pressed");
+	if (key_pressed(ks, KEY_H)) TRACE("H key pressed");
+	if (key_pressed(ks, KEY_I)) TRACE("I key pressed");
+	if (key_pressed(ks, KEY_J)) TRACE("J key pressed");
+	if (key_pressed(ks, KEY_K)) TRACE("K key pressed");
+	if (key_pressed(ks, KEY_L)) TRACE("L key pressed");
+	if (key_pressed(ks, KEY_M)) TRACE("M key pressed");
+	if (key_pressed(ks, KEY_N)) TRACE("N key pressed");
+	if (key_pressed(ks, KEY_O)) TRACE("O key pressed");
+	if (key_pressed(ks, KEY_P)) TRACE("P key pressed");
+	if (key_pressed(ks, KEY_Q)) TRACE("Q key pressed");
+	if (key_pressed(ks, KEY_R)) TRACE("R key pressed");
+	if (key_pressed(ks, KEY_S)) TRACE("S key pressed");
+	if (key_pressed(ks, KEY_T)) TRACE("T key pressed");
+	if (key_pressed(ks, KEY_U)) TRACE("U key pressed");
+	if (key_pressed(ks, KEY_V)) TRACE("V key pressed");
+	if (key_pressed(ks, KEY_W)) TRACE("W key pressed");
+	if (key_pressed(ks, KEY_X)) TRACE("X key pressed");
+	if (key_pressed(ks, KEY_Y)) TRACE("Y key pressed");
+	if (key_pressed(ks, KEY_Z)) TRACE("Z key pressed");
 
-	if (key_pressed(ks, KEY_MINUS)) SDL_Log("MINUS key pressed");
-	if (key_pressed(ks, KEY_EQUALS)) SDL_Log("EQUALS key pressed");
-	if (key_pressed(ks, KEY_LEFTBRACKET)) SDL_Log("LEFTBRACKET key pressed");
-	if (key_pressed(ks, KEY_RIGHTBRACKET)) SDL_Log("RIGHTBRACKET key pressed");
-	if (key_pressed(ks, KEY_BACKSLASH)) SDL_Log("BACKSLASH key pressed");
-	if (key_pressed(ks, KEY_SEMICOLON)) SDL_Log("SEMICOLON key pressed");
-	if (key_pressed(ks, KEY_APOSTROPHE)) SDL_Log("APOSTROPHE key pressed");
-	if (key_pressed(ks, KEY_GRAVE)) SDL_Log("GRAVE key pressed");
-	if (key_pressed(ks, KEY_COMMA)) SDL_Log("COMMA key pressed");
-	if (key_pressed(ks, KEY_PERIOD)) SDL_Log("PERIOD key pressed");
-	if (key_pressed(ks, KEY_SLASH)) SDL_Log("SLASH key pressed");
+	if (key_pressed(ks, KEY_MINUS)) TRACE("MINUS key pressed");
+	if (key_pressed(ks, KEY_EQUALS)) TRACE("EQUALS key pressed");
+	if (key_pressed(ks, KEY_LEFTBRACKET)) TRACE("LEFTBRACKET key pressed");
+	if (key_pressed(ks, KEY_RIGHTBRACKET)) TRACE("RIGHTBRACKET key pressed");
+	if (key_pressed(ks, KEY_BACKSLASH)) TRACE("BACKSLASH key pressed");
+	if (key_pressed(ks, KEY_SEMICOLON)) TRACE("SEMICOLON key pressed");
+	if (key_pressed(ks, KEY_APOSTROPHE)) TRACE("APOSTROPHE key pressed");
+	if (key_pressed(ks, KEY_GRAVE)) TRACE("GRAVE key pressed");
+	if (key_pressed(ks, KEY_COMMA)) TRACE("COMMA key pressed");
+	if (key_pressed(ks, KEY_PERIOD)) TRACE("PERIOD key pressed");
+	if (key_pressed(ks, KEY_SLASH)) TRACE("SLASH key pressed");
 
-	if (key_pressed(ks, KEY_ESCAPE)) SDL_Log("ESCAPE key pressed");
-	if (key_pressed(ks, KEY_TAB)) SDL_Log("TAB key pressed");
-	if (key_pressed(ks, KEY_SPACE)) SDL_Log("SPACE key pressed");
+	if (key_pressed(ks, KEY_ESCAPE)) TRACE("ESCAPE key pressed");
+	if (key_pressed(ks, KEY_TAB)) TRACE("TAB key pressed");
+	if (key_pressed(ks, KEY_SPACE)) TRACE("SPACE key pressed");
 
-	if (key_pressed(ks, KEY_F1)) SDL_Log("F1 key pressed");
-	if (key_pressed(ks, KEY_F2)) SDL_Log("F2 key pressed");
-	if (key_pressed(ks, KEY_F3)) SDL_Log("F3 key pressed");
-	if (key_pressed(ks, KEY_F4)) SDL_Log("F4 key pressed");
-	if (key_pressed(ks, KEY_F5)) SDL_Log("F5 key pressed");
-	if (key_pressed(ks, KEY_F6)) SDL_Log("F6 key pressed");
-	if (key_pressed(ks, KEY_F7)) SDL_Log("F7 key pressed");
-	if (key_pressed(ks, KEY_F8)) SDL_Log("F8 key pressed");
-	if (key_pressed(ks, KEY_F9)) SDL_Log("F9 key pressed");
-	if (key_pressed(ks, KEY_F10)) SDL_Log("F10 key pressed");
-	if (key_pressed(ks, KEY_F11)) SDL_Log("F11 key pressed");
-	if (key_pressed(ks, KEY_F12)) SDL_Log("F12 key pressed");
+	if (key_pressed(ks, KEY_F1)) TRACE("F1 key pressed");
+	if (key_pressed(ks, KEY_F2)) TRACE("F2 key pressed");
+	if (key_pressed(ks, KEY_F3)) TRACE("F3 key pressed");
+	if (key_pressed(ks, KEY_F4)) TRACE("F4 key pressed");
+	if (key_pressed(ks, KEY_F5)) TRACE("F5 key pressed");
+	if (key_pressed(ks, KEY_F6)) TRACE("F6 key pressed");
+	if (key_pressed(ks, KEY_F7)) TRACE("F7 key pressed");
+	if (key_pressed(ks, KEY_F8)) TRACE("F8 key pressed");
+	if (key_pressed(ks, KEY_F9)) TRACE("F9 key pressed");
+	if (key_pressed(ks, KEY_F10)) TRACE("F10 key pressed");
+	if (key_pressed(ks, KEY_F11)) TRACE("F11 key pressed");
+	if (key_pressed(ks, KEY_F12)) TRACE("F12 key pressed");
 
 	// Mouse
 	MouseState* ms = &game_input->mouse_state;
-	if (mouse_button_pressed(ms, MOUSE_BUTTON_LEFT)) SDL_Log("Left Mouse Button Pressed");
-	if (mouse_button_pressed(ms, MOUSE_BUTTON_RIGHT)) SDL_Log("Right Mouse Button Pressed");
-	if (mouse_button_pressed(ms, MOUSE_BUTTON_MIDDLE)) SDL_Log("Middle Mouse Button Pressed");
-	if (mouse_button_pressed(ms, MOUSE_BUTTON_SIDE_1)) SDL_Log("Side Mouse Button 1 Pressed");
-	if (mouse_button_pressed(ms, MOUSE_BUTTON_SIDE_2)) SDL_Log("Side Mouse Button 2 Pressed");
+	if (mouse_button_pressed(ms, MOUSE_BUTTON_LEFT)) TRACE("Left Mouse Button Pressed");
+	if (mouse_button_pressed(ms, MOUSE_BUTTON_RIGHT)) TRACE("Right Mouse Button Pressed");
+	if (mouse_button_pressed(ms, MOUSE_BUTTON_MIDDLE)) TRACE("Middle Mouse Button Pressed");
+	if (mouse_button_pressed(ms, MOUSE_BUTTON_SIDE_1)) TRACE("Side Mouse Button 1 Pressed");
+	if (mouse_button_pressed(ms, MOUSE_BUTTON_SIDE_2)) TRACE("Side Mouse Button 2 Pressed");
 
-	SDL_Log("Axis Right X Value: %f", ms->pos_x);
-	SDL_Log("Axis Right Y Value: %f", ms->pos_y);
+	TRACE("Axis Right X Value: %f", ms->pos_x);
+	TRACE("Axis Right Y Value: %f", ms->pos_y);
 
-	SDL_Log("Axis Right X Relative Value: %f", ms->rel_x);
-	SDL_Log("Axis Right Y Relative Value: %f", ms->rel_y);
+	TRACE("Axis Right X Relative Value: %f", ms->rel_x);
+	TRACE("Axis Right Y Relative Value: %f", ms->rel_y);
 */
 }

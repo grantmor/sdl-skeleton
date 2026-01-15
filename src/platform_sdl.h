@@ -114,6 +114,8 @@ typedef struct {
 	PlatformAPI platform_api;
 } AppState;
 
+static PlatformAPI* g_platform_api;
+
 // *** File IO ***
 i64 platform_file_timestamp_get(char* file);
 

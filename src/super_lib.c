@@ -9,7 +9,7 @@
 #include <SDL3/SDL_assert.h>
 #include "types.h"
 #include "super_lib.h"
-// #include "platform_sdl.h"
+#include "platform_sdl.h"
 
 Arena arena_alloc_make(u8* backing_buffer, usize size)
 {
@@ -40,8 +40,7 @@ u8* arena_alloc(Arena* alloc, usize size)
 	}
 	else
 	{
-		SDL_Log("Allocator is full!");
-		// platform_error("Allocator is full!");
+		ERROR("Allocator is full!");
 		return NULL;
 	}
 
@@ -178,7 +177,7 @@ String str_put(MemoryContext* mctx, u32 count, ...)
 	result.length = char_count;
 
 	arena_sub_end(scratch);
-	// SDL_Log(str_to_cstring(mctx, result));
+
 	return result;
 }
 
