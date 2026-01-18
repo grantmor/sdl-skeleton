@@ -6,6 +6,13 @@
 
 static PlatformAPI* g_platform = NULL;
 
+#ifdef __EMSCRIPTEN__
+// On the web, disable logging
+#define TRACE(...) ((void)0)
+#define INFO(...)  ((void)0)
+#define WARN(...)  ((void)0)
+#define ERROR(...) ((void)0)
+#else
 // redefine TRACE macros for the .so to use local pointer
 #undef TRACE
 #undef INFO
@@ -16,6 +23,9 @@ static PlatformAPI* g_platform = NULL;
 #define INFO(...)  g_platform->platform_info_ptr(__VA_ARGS__)
 #define WARN(...)  g_platform->platform_warn_ptr(__VA_ARGS__)
 #define ERROR(...) g_platform->platform_error_ptr(__VA_ARGS__)
+
+#include "super_lib.c"
+#endif
 
 #include "audio.h"
 #include "input.h"

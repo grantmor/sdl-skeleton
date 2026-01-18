@@ -4,7 +4,9 @@
 
 #include "platform_sdl.h"
 
-
+//
+// #include "super_lib.c"
+// 
 #include "platform_iterate.c"
 #include "platform_init.c"
 #include "platform_event.c"
@@ -115,6 +117,16 @@ i64 platform_file_timestamp_get(char* file)
 
 void platform_sprite_atlas_load(SDL_Renderer* renderer, SpriteAtlas* atlas)
 {
+	if (!g_platform_api) {
+        printf("FATAL: g_platform is NULL!\n");
+        return;
+    }
+
+    if (!atlas || !atlas->path) {
+        printf("FATAL: atlas or atlas->path is NULL!\n");
+        return;
+    }
+
 	INFO("atlas path: %s", atlas->path);
 	if (atlas->atlas)
 	{

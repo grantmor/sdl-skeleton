@@ -14,8 +14,8 @@
 #define ARENA_APP_SIZE MB(8)
 #define SCRATCH_APP_SIZE MB(8)
 
-#define ARENA_FRAME_SIZE MB(256)
-#define SCRATCH_FRAME_SIZE MB(256)
+#define ARENA_FRAME_SIZE MB(64)
+#define SCRATCH_FRAME_SIZE MB(64)
 
 typedef enum {
 	TEXT_COLOR_BLACK,
@@ -141,7 +141,15 @@ void platform_error(const char* fmt, ...);
 #define ERROR(...) platform_error(__VA_ARGS__)
 */
 
+#ifdef __EMSCRIPTEN__
+// On the web, disable logging
+#define TRACE(...) ((void)0)
+#define INFO(...)  ((void)0)
+#define WARN(...)  ((void)0)
+#define ERROR(...) ((void)0)
+#else
 #define TRACE(...) g_platform_api->platform_trace_ptr(__VA_ARGS__)
 #define INFO(...)  g_platform_api->platform_info_ptr(__VA_ARGS__)
 #define WARN(...)  g_platform_api->platform_warn_ptr(__VA_ARGS__)
 #define ERROR(...) g_platform_api->platform_error_ptr(__VA_ARGS__)
+#endif

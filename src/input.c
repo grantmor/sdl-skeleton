@@ -9,7 +9,13 @@
 #include "types.h"
 #include "platform_sdl.h"
 #include "input.h"
+
+#include "super_lib.h"
+/*
+#ifndef __EMSCRIPTEN__
 #include "super_lib.c"
+#endif
+*/
 
 //TODO: Add features of mapping keys and gamepad controls to "Actions"
 
