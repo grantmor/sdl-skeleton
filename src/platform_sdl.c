@@ -52,7 +52,8 @@
 	
 	// SDL_Log("%s%s%s%s \033[0m", text_color_code, log_type_text, message, new_line);
 	// SDL_Log("%s%s%s%s%s \033[0m", text_color_code, log_type_text, text_color_white, message, new_line);
-	SDL_Log("%s%s%s%s \033[0m", text_color_code, log_type_text, text_color_white, message);
+	// SDL_Log("%s%s%s%s \033[0m", text_color_code, log_type_text, text_color_white, message);
+	SDL_Log("%s%s%s \033[0m", text_color_code, log_type_text, message);
 }
 
 // FIXME: Accepting dependence on libc for a while to get this thing ready to use
@@ -115,37 +116,6 @@ i64 platform_file_timestamp_get(char* file)
 	return path_info.modify_time;
 }
 
-void platform_sprite_atlas_load(SDL_Renderer* renderer, SpriteAtlas* atlas)
-{
-	if (!g_platform_api) {
-        ERROR("FATAL: g_platform is NULL!\n");
-        return;
-    }
-
-    if (!atlas || !atlas->path) {
-        ERROR("FATAL: atlas or atlas->path is NULL!\n");
-        return;
-    }
-
-	INFO("atlas path: %s", atlas->path);
-	if (atlas->atlas)
-	{
-		SDL_DestroyTexture(atlas->atlas);
-	}
-
-	SDL_Surface* sprite_atlas_surf = SDL_LoadBMP(atlas->path);
-	SDL_Texture* sprite_atlas_tex = SDL_CreateTextureFromSurface(renderer, sprite_atlas_surf);
-	if (!sprite_atlas_tex) {
-	    ERROR("Failed to create texture: %s", SDL_GetError());
-	}
-	else
-	{
-		atlas->atlas = sprite_atlas_tex;
-		atlas->modified = platform_file_timestamp_get(atlas->path);
-		SDL_DestroySurface(sprite_atlas_surf);
-		SDL_SetTextureScaleMode(atlas->atlas, SDL_SCALEMODE_NEAREST);
-	}
-}
 
 SDL_AppResult SDL_AppInit(void** appstate, int argc, char *argv[])
 {

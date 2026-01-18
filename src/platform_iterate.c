@@ -14,8 +14,12 @@
 #include "game_update.h"
 #include "platform_sdl.h"
 
+// #ifdef RENDER_SDL_2D
+	#include "render_sdl_2d.h"
+// #endif
+
 #ifdef __EMSCRIPTEN__
-#include "game_update.c"  // Make sure this file is compiled into the TU
+	#include "game_update.c"  // Make sure this file is compiled into the executable
 #endif
 
 typedef void (*game_init_fn)(PlatformAPI* platform);
@@ -135,31 +139,6 @@ void platform_reload_game(void)
     INFO("Successfully reloaded game_update.so");
 }
 
-void platform_render(AppState* as)
-{
-	SDL_Renderer* renderer = as->renderer;
-	SpriteAtlas* sprite_atlas = &as->sprite_atlas;
-
-	if (platform_file_timestamp_get(sprite_atlas->path) > sprite_atlas->modified)
-	{
-		platform_sprite_atlas_load(renderer, sprite_atlas);
-	}
-
-	SDL_SetRenderDrawColorFloat(renderer, 0.0,0.0,0.0,1.0);
-	SDL_RenderClear(renderer);
-
-	// Layer 0 - Just here to visualize screen area and letterboxing
-	SDL_SetRenderDrawColor(renderer, 0.0, 0.0, 255, 255);
-	SDL_FRect rect = (SDL_FRect) {0.0,0.0,320.0,180.0};
-	SDL_RenderFillRect(renderer, &rect);
-
-	// Layer 1 - Testing Sprite Atlas
-	SDL_FRect sprite_rect = (SDL_FRect) {0.0,0.0,0.0,0.0};
-	SDL_GetTextureSize(sprite_atlas->atlas, &sprite_rect.w, &sprite_rect.h);
-	SDL_RenderTexture(renderer, sprite_atlas->atlas, NULL, &sprite_rect);
-
-	SDL_RenderPresent(renderer);
-}
 
 void sound_clip_play(SoundManager* sound_man, SoundClip* clip)
 {
@@ -209,7 +188,8 @@ SDL_AppResult platform_iterate(AppState* as)
 	game_step(as);
 	#endif
 
-	platform_render(as);
+	// platform_render(as);
+ 	render_frame();
 	platform_audio(&as->sound_manager);
 
 	return SDL_APP_CONTINUE;

@@ -7,9 +7,13 @@
 
 #include "types.h"
 
+// ifdef
+#include "render_sdl_2d.h"
+
 void platform_quit(AppState* as)
 {
-	SDL_DestroyRenderer(as->renderer);
+	render_free();
+	// SDL_DestroyRenderer(as->renderer);
 	SDL_DestroyWindow(as->window);
 
 	SDL_free(as);

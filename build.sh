@@ -35,12 +35,12 @@ if [[ "$target" == web ]]; then
 
 elif [[ "$target" == native ]]; then
   if [[ "$render" == sdl ]]; then
-    defines=$defines"-DRENDER_SDL "
+    defines=$defines"-DRENDER_SDL_2D "
   elif [[ "$render" == gl ]]; then
     defines=$defines"-DRENDER_GL "
   else
     render=sdl
-    defines=$defines"-DRENDER_SDL "
+    defines=$defines"-DRENDER_SDL_2D "
   fi
 
   if [[ "$debug" == 1 ]]; then

@@ -13,6 +13,7 @@
 #include <SDL3/SDL_surface.h>
 #include <SDL3/SDL_timer.h>
 
+#include <SDL3/SDL_video.h>
 #include <stdarg.h>
 
 #include "audio.h"
@@ -20,6 +21,12 @@
 #include "types.h"
 #include "super_lib.c"
 #include "platform_sdl.h"
+
+
+// #ifdef RENDER_SDL_2D
+ 	#include "render_sdl_2d.h"
+	#include "render_sdl_2d.c"
+// #endif
 
 static const char RES_DIR[] = "res";
 static const char IMG_DIR[] = "image";
@@ -77,14 +84,17 @@ SDL_AppResult platform_init(void** appstate)
 
 	MemoryContext mctx = (MemoryContext) {.arena = &app_arena, .scratch = &app_scratch};
 
-	// Video
-	if (!SDL_CreateWindowAndRenderer("SDL3 Skeleton", 1280, 720, SDL_WINDOW_RESIZABLE, &as->window, &as->renderer))
-	{
-		ERROR("Failed to create window/renderer: %s.", SDL_GetError());
-		return SDL_APP_FAILURE;		
-	}
+	// Window
+	SDL_Window* window = SDL_CreateWindow("SDL3 Skeleton", 1280, 720, SDL_WINDOW_RESIZABLE);
+	as->window = window;
 
-	SDL_SetRenderLogicalPresentation(as->renderer, 640, 360, SDL_LOGICAL_PRESENTATION_LETTERBOX);
+	
+	render_init(window);
+	// if (!SDL_CreateWindowAndRenderer("SDL3 Skeleton", 1280, 720, SDL_WINDOW_RESIZABLE, &as->window, &as->renderer))
+	// {
+	// 	ERROR("Failed to create window/renderer: %s.", SDL_GetError());
+	// 	return SDL_APP_FAILURE;		
+	// }
 
 	// Input
 	// Pump events to ensure gamepad can be accessed
@@ -123,9 +133,6 @@ SDL_AppResult platform_init(void** appstate)
 	};
 	as->time = time;
 
-	// Textures
-	as->sprite_atlas.path = "res/image/sprites.bmp";
-	platform_sprite_atlas_load(as->renderer, &as->sprite_atlas);
 
 	// Audio
 	SoundManager* sound_manager = &as->sound_manager;

@@ -60,15 +60,6 @@ typedef struct {
 } GameInput;
 
 typedef struct {
-	SDL_Texture* atlas;
-	SDL_Time modified;
-	char* path;
-	
-	u32 width;
-	u32 height;
-} SpriteAtlas;
-
-typedef struct {
 	Arena app_arena;
 	Arena app_scratch;
 
@@ -93,7 +84,7 @@ typedef struct {
 
 typedef struct {
 	SDL_Window* window;
-	SDL_Renderer* renderer;
+	// SDL_Renderer* renderer;
 
 	Time time;
 
@@ -102,7 +93,7 @@ typedef struct {
 	GameInput game_input;
 
 	// Video
-	SpriteAtlas sprite_atlas;
+	// SpriteAtlas sprite_atlas;
 
 	// Sound
 	SoundManager sound_manager;
@@ -121,7 +112,6 @@ i64 platform_file_timestamp_get(char* file);
 
 void platform_file_load();
 
-void platform_sprite_atlas_load(SDL_Renderer* renderer, SpriteAtlas* atlas);
 
 void platform_log(char* message, LogType log_type);
 
