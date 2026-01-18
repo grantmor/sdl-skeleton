@@ -133,23 +133,24 @@ void platform_warn(const char* fmt, ...);
 
 void platform_error(const char* fmt, ...);
 
-// Convenience macros for clean callsites
-/*
-#define TRACE(...) platform_trace(__VA_ARGS__)
-#define INFO(...)  platform_info(__VA_ARGS__)
-#define WARN(...)  platform_warn(__VA_ARGS__)
-#define ERROR(...) platform_error(__VA_ARGS__)
-*/
-
 #ifdef __EMSCRIPTEN__
 // On the web, disable logging
 #define TRACE(...) ((void)0)
 #define INFO(...)  ((void)0)
 #define WARN(...)  ((void)0)
 #define ERROR(...) ((void)0)
+#define ASSERT(...) ((void)0)
 #else
 #define TRACE(...) g_platform_api->platform_trace_ptr(__VA_ARGS__)
 #define INFO(...)  g_platform_api->platform_info_ptr(__VA_ARGS__)
 #define WARN(...)  g_platform_api->platform_warn_ptr(__VA_ARGS__)
 #define ERROR(...) g_platform_api->platform_error_ptr(__VA_ARGS__)
+#define ASSERT(x, ...) \
+{\
+	if (!(x))\
+	{\
+		ERROR(__VA_ARGS__);\
+		__builtin_debugtrap();\
+	}\
+}
 #endif

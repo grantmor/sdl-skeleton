@@ -52,7 +52,8 @@
 	}
 	
 	// SDL_Log("%s%s%s%s \033[0m", text_color_code, log_type_text, message, new_line);
-	SDL_Log("%s%s%s%s%s \033[0m", text_color_code, log_type_text, text_color_white, message, new_line);
+	// SDL_Log("%s%s%s%s%s \033[0m", text_color_code, log_type_text, text_color_white, message, new_line);
+	SDL_Log("%s%s%s%s \033[0m", text_color_code, log_type_text, text_color_white, message);
 }
 
 // FIXME: Accepting dependence on libc for a while to get this thing ready to use

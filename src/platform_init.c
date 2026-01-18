@@ -55,17 +55,9 @@ SDL_AppResult platform_init(void** appstate)
 	SDL_SetAppMetadata("SDL3 Skeleton", "0.1", "sgz");
 	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD | SDL_INIT_AUDIO);
 
-	/*
-	if (init_result)
-	{
-		SDL_Log("Failed to initialize SDL: %s.", SDL_GetError());
-		
-		return SDL_APP_FAILURE;
-	}
-	*/
+	//FIXME: Handle errors
 
 	AppState* as = (AppState*) SDL_calloc(1, sizeof(AppState));
-
 
 	// Function pointers for platform API
 	g_platform_api = &as->platform_api;
