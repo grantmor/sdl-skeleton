@@ -3,7 +3,6 @@
 #include <SDL3/SDL_main.h>
 
 #include "platform_sdl.h"
-
 //
 // #include "super_lib.c"
 // 
@@ -107,8 +106,8 @@ i64 platform_file_timestamp_get(char* file)
 	SDL_PathInfo path_info;
 	if (!SDL_GetPathInfo(file, &path_info))
 	{
-		#ifndef __EMSCRIPTEN__
-		platform_trace("Could not get timestamp for file because we're on the web!");	
+		#ifdef __EMSCRIPTEN__
+			WARN("Could not get timestamp for file because we're on the web!");	
 		#endif
 		return -1;
 	}
@@ -119,12 +118,12 @@ i64 platform_file_timestamp_get(char* file)
 void platform_sprite_atlas_load(SDL_Renderer* renderer, SpriteAtlas* atlas)
 {
 	if (!g_platform_api) {
-        printf("FATAL: g_platform is NULL!\n");
+        ERROR("FATAL: g_platform is NULL!\n");
         return;
     }
 
     if (!atlas || !atlas->path) {
-        printf("FATAL: atlas or atlas->path is NULL!\n");
+        ERROR("FATAL: atlas or atlas->path is NULL!\n");
         return;
     }
 

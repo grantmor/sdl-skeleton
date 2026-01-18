@@ -119,7 +119,6 @@ void game_step(AppState* as)
 {
     // game_init(&as->platform_api);
     sound_list_clear(&as->sound_manager);
-
     time_update(&as->time);
 
 	platform_gamepad_update(as);
