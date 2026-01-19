@@ -48,17 +48,19 @@ void render_init(SDL_Window* window)
 
 	SDL_SetRenderLogicalPresentation(g_rctx.sdl_renderer, g_rctx.render_size.x, g_rctx.render_size.y, SDL_LOGICAL_PRESENTATION_LETTERBOX);
 
-	// Textures
 	for (usize a=0; a<ATLAS_COUNT; a++)
 	{
 		switch (a)
 		{
-			case ATLAS_BG_IDX:
+			case ATLAS_BG:
 				g_rctx.atlas[a].path = "res/image/bg.bmp";
-			case ATLAS_TILE_IDX:
+				break;
+			case ATLAS_TILE:
 				g_rctx.atlas[a].path = "res/image/tile.bmp";
-			case ATLAS_SPRITE_IDX:
+				break;
+			case ATLAS_SPRITE:
 				g_rctx.atlas[a].path = "res/image/sprite.bmp";
+				break;
 		}
 
 		render_texture_atlas_load(g_rctx.sdl_renderer, &g_rctx.atlas[a]);
@@ -78,10 +80,10 @@ void render_clear(RenderCtx* rctx)
 	SDL_RenderFillRect(sdl_ren, &screen_rect);
 }
 
-void render_atlas(RenderCtx* rctx)
+void render_atlas(RenderCtx* rctx, AtlasType atlas_type)
 {
 	SDL_Renderer* sdl_ren = rctx->sdl_renderer;
-	TextureAtlas* sprite_atlas = &rctx->atlas[ATLAS_SPRITE_IDX];
+	TextureAtlas* sprite_atlas = &rctx->atlas[ATLAS_SPRITE];
 
 	if (platform_file_timestamp_get(sprite_atlas->path) > sprite_atlas->modified)
 	{
@@ -96,7 +98,7 @@ void render_atlas(RenderCtx* rctx)
 void render_frame(RenderList* render_list)
 {
 	render_clear(&g_rctx);
-	render_atlas(&g_rctx);
+	render_atlas(&g_rctx, ATLAS_SPRITE);
 	SDL_RenderPresent(g_rctx.sdl_renderer);
 }
 

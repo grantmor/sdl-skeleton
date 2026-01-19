@@ -12,11 +12,11 @@ typedef struct {
 } TextureAtlas;
 
 typedef enum {
-	ATLAS_BG_IDX,
-	ATLAS_TILE_IDX,
-	ATLAS_SPRITE_IDX,
+	ATLAS_BG,
+	ATLAS_TILE,
+	ATLAS_SPRITE,
 	ATLAS_COUNT,
-} AtlasIndex;
+} AtlasType;
 
 typedef struct {
 	SDL_Renderer* sdl_renderer;
@@ -60,7 +60,7 @@ void render_texture_atlas_load(SDL_Renderer* renderer, TextureAtlas* atlas);
 
 void render_clear(RenderCtx* rctx);
 
-void render_atlas(RenderCtx* rctx);
+void render_atlas(RenderCtx* rctx, AtlasType atlas_type);
 
 void render_init(SDL_Window* window);
 
