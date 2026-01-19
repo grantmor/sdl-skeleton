@@ -36,7 +36,7 @@ void render_texture_atlas_load(SDL_Renderer* renderer, TextureAtlas* atlas)
 		SDL_DestroySurface(sprite_atlas_surf);
 		SDL_SetTextureScaleMode(atlas->data, SDL_SCALEMODE_NEAREST);
 
-		INFO("%s successfully loaded.", atlas->path);
+		INFO("%s loaded", atlas->path);
 	}
 }
 

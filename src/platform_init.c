@@ -112,7 +112,7 @@ SDL_AppResult platform_init(void** appstate)
 		}
 		else
 		{
-			INFO("Gamepad Name: %s\n", SDL_GetGamepadName(controller));
+			INFO("Controller Name: %s detected", SDL_GetGamepadName(controller));
 			as->platform_input.platform_gamepad = controller;
 		}
 	}
