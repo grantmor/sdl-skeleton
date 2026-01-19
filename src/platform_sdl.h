@@ -9,6 +9,8 @@
 #include "input.h"
 
 #include "super_lib.h"
+// #ifdef
+#include "render_sdl_2d.h"
 // #include "super_lib.c"
 
 #define ARENA_APP_SIZE MB(8)
@@ -84,7 +86,6 @@ typedef struct {
 
 typedef struct {
 	SDL_Window* window;
-	// SDL_Renderer* renderer;
 
 	Time time;
 
@@ -93,8 +94,8 @@ typedef struct {
 	GameInput game_input;
 
 	// Video
-	// SpriteAtlas sprite_atlas;
-
+	RenderList render_list;
+	
 	// Sound
 	SoundManager sound_manager;
 
@@ -112,7 +113,6 @@ i64 platform_file_timestamp_get(char* file);
 
 void platform_file_load();
 
-
 void platform_log(char* message, LogType log_type);
 
 void platform_trace(const char* fmt, ...);
@@ -124,23 +124,24 @@ void platform_warn(const char* fmt, ...);
 void platform_error(const char* fmt, ...);
 
 #ifdef __EMSCRIPTEN__
-// On the web, disable logging
-#define TRACE(...) ((void)0)
-#define INFO(...)  ((void)0)
-#define WARN(...)  ((void)0)
-#define ERROR(...) ((void)0)
-#define ASSERT(...) ((void)0)
+	// On the web, disable logging
+	#define TRACE(...) ((void)0)
+	#define INFO(...)  ((void)0)
+	#define WARN(...)  ((void)0)
+	#define ERROR(...) ((void)0)
+	#define ASSERT(...) ((void)0)
 #else
-#define TRACE(...) g_platform_api->platform_trace_ptr(__VA_ARGS__)
-#define INFO(...)  g_platform_api->platform_info_ptr(__VA_ARGS__)
-#define WARN(...)  g_platform_api->platform_warn_ptr(__VA_ARGS__)
-#define ERROR(...) g_platform_api->platform_error_ptr(__VA_ARGS__)
-#define ASSERT(x, ...) \
-{\
-	if (!(x))\
-	{\
-		ERROR(__VA_ARGS__);\
-		__builtin_debugtrap();\
-	}\
-}
+	#define TRACE(...) g_platform_api->platform_trace_ptr(__VA_ARGS__)
+	#define INFO(...)  g_platform_api->platform_info_ptr(__VA_ARGS__)
+	#define WARN(...)  g_platform_api->platform_warn_ptr(__VA_ARGS__)
+	#define ERROR(...) g_platform_api->platform_error_ptr(__VA_ARGS__)
+
+	#define ASSERT(x, ...) \
+	{ \
+		if (!(x)) \
+		{\
+			ERROR(__VA_ARGS__); \
+			__builtin_debugtrap(); \
+		} \
+	}
 #endif

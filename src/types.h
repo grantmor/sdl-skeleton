@@ -31,4 +31,14 @@ typedef size_t usize;
 typedef struct {
 	f32 x;
 	f32 y;	
-} vf2;
+} v2f;
+
+typedef struct {
+	i32 x;
+	i32 y;
+} v2i;
+
+typedef struct {
+	u32 x;
+	u32 y;
+} v2u;

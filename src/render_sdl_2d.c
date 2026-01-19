@@ -1,11 +1,12 @@
 #include "SDL3/SDL.h"
 #include "render_sdl_2d.h"
 #include "platform_sdl.h"
+#include <SDL3/SDL_oldnames.h>
 #include <SDL3/SDL_render.h>
 
-static Renderer g_renderer;
+static RenderCtx g_rctx;
 
-void render_sprite_atlas_load(SDL_Renderer* renderer, SpriteAtlas* atlas)
+void render_texture_atlas_load(SDL_Renderer* renderer, TextureAtlas* atlas)
 {
 	if (!g_platform_api) {
         ERROR("FATAL: g_platform is NULL!\n");
@@ -18,69 +19,93 @@ void render_sprite_atlas_load(SDL_Renderer* renderer, SpriteAtlas* atlas)
     }
 
 	INFO("atlas path: %s", atlas->path);
-	if (atlas->atlas)
+	if (atlas->data)
 	{
-		SDL_DestroyTexture(atlas->atlas);
+		SDL_DestroyTexture(atlas->data);
 	}
 
 	SDL_Surface* sprite_atlas_surf = SDL_LoadBMP(atlas->path);
 	SDL_Texture* sprite_atlas_tex = SDL_CreateTextureFromSurface(renderer, sprite_atlas_surf);
+
 	if (!sprite_atlas_tex) {
 	    WARN("Failed to create texture: %s", SDL_GetError());
 	}
 	else
 	{
-		atlas->atlas = sprite_atlas_tex;
+		atlas->data = sprite_atlas_tex;
 		atlas->modified = platform_file_timestamp_get(atlas->path);
 		SDL_DestroySurface(sprite_atlas_surf);
-		SDL_SetTextureScaleMode(atlas->atlas, SDL_SCALEMODE_NEAREST);
+		SDL_SetTextureScaleMode(atlas->data, SDL_SCALEMODE_NEAREST);
 	}
 }
 
 void render_init(SDL_Window* window)
 {
-	g_renderer = (Renderer){0};
-	g_renderer.sdl_renderer = SDL_CreateRenderer(window, NULL);
-	SDL_SetRenderLogicalPresentation(g_renderer.sdl_renderer, 640, 360, SDL_LOGICAL_PRESENTATION_LETTERBOX);
+	g_rctx = (RenderCtx) {0};
+	g_rctx.sdl_renderer = SDL_CreateRenderer(window, NULL);
+
+	g_rctx.render_size = (v2u) {640, 480};
+
+	SDL_SetRenderLogicalPresentation(g_rctx.sdl_renderer, g_rctx.render_size.x, g_rctx.render_size.y, SDL_LOGICAL_PRESENTATION_LETTERBOX);
+
 	// Textures
-	g_renderer.sprite_atlas.path = "res/image/sprites.bmp";
-	render_sprite_atlas_load(g_renderer.sdl_renderer, &g_renderer.sprite_atlas);
+	for (usize a=0; a<ATLAS_COUNT; a++)
+	{
+		switch (a)
+		{
+			case ATLAS_BG_IDX:
+				g_rctx.atlas[a].path = "res/image/bg.bmp";
+			case ATLAS_TILE_IDX:
+				g_rctx.atlas[a].path = "res/image/tile.bmp";
+			case ATLAS_SPRITE_IDX:
+				g_rctx.atlas[a].path = "res/image/sprite.bmp";
+		}
+
+		render_texture_atlas_load(g_rctx.sdl_renderer, &g_rctx.atlas[a]);
+	}
+
 }
 
-void platform_render(Renderer* renderer)
+void render_clear(RenderCtx* rctx)
 {
-	// SDL_Renderer* renderer = as->renderer;
-	SpriteAtlas* sprite_atlas = &renderer->sprite_atlas;
+	SDL_Renderer* sdl_ren = rctx->sdl_renderer;
+	SDL_SetRenderDrawColorFloat(sdl_ren, 0.0,0.0,0.0,1.0);
+	SDL_RenderClear(sdl_ren);
+
+	// Size of the framebuffer to visualize letterboxing
+	SDL_SetRenderDrawColorFloat(sdl_ren, 0.0, 0.0, 1.0, 1.0);
+	SDL_FRect screen_rect = (SDL_FRect) {0.0,0.0, rctx->render_size.x, rctx->render_size.y};
+	SDL_RenderFillRect(sdl_ren, &screen_rect);
+}
+
+void render_atlas(RenderCtx* rctx)
+{
+	SDL_Renderer* sdl_ren = rctx->sdl_renderer;
+	TextureAtlas* sprite_atlas = &rctx->atlas[ATLAS_SPRITE_IDX];
 
 	if (platform_file_timestamp_get(sprite_atlas->path) > sprite_atlas->modified)
 	{
-		render_sprite_atlas_load(g_renderer.sdl_renderer, sprite_atlas);
+		render_texture_atlas_load(sdl_ren, sprite_atlas);
 	}
 
-	SDL_SetRenderDrawColorFloat(g_renderer.sdl_renderer, 0.0,0.0,0.0,1.0);
-	SDL_RenderClear(renderer->sdl_renderer);
-
-	// Layer 0 - Just here to visualize screen area and letterboxing
-	SDL_SetRenderDrawColor(renderer->sdl_renderer, 0.0, 0.0, 255, 255);
-	SDL_FRect rect = (SDL_FRect) {0.0,0.0,320.0,180.0};
-	SDL_RenderFillRect(renderer->sdl_renderer, &rect);
-
-	// Layer 1 - Testing Sprite Atlas
 	SDL_FRect sprite_rect = (SDL_FRect) {0.0,0.0,0.0,0.0};
-	SDL_GetTextureSize(sprite_atlas->atlas, &sprite_rect.w, &sprite_rect.h);
-	SDL_RenderTexture(renderer->sdl_renderer, sprite_atlas->atlas, NULL, &sprite_rect);
-
-	SDL_RenderPresent(renderer->sdl_renderer);
+	SDL_GetTextureSize(sprite_atlas->data, &sprite_rect.w, &sprite_rect.h);
+	SDL_RenderTexture(sdl_ren, sprite_atlas->data, NULL, &sprite_rect);
 }
 
-
-void render_frame()
+void render_frame(RenderList* render_list)
 {
-	platform_render(&g_renderer);
+	render_clear(&g_rctx);
+	render_atlas(&g_rctx);
+	SDL_RenderPresent(g_rctx.sdl_renderer);
 }
 
 void render_free()
 {
-	SDL_DestroyTexture(g_renderer.sprite_atlas.atlas);
-	SDL_DestroyRenderer(g_renderer.sdl_renderer);
+	for (usize a=0; a<ATLAS_COUNT; a++)
+	{
+		SDL_DestroyTexture(g_rctx.atlas[a].data);
+	}
+
+	SDL_DestroyRenderer(g_rctx.sdl_renderer);
 }

@@ -284,17 +284,17 @@ i16 deadzone(ControllerState* cs, ControllerAxisMap axis)
 	return val;
 }
 
-vf2 stick_vec_left(ControllerState* cs)
+v2f stick_vec_left(ControllerState* cs)
 {
-	return (vf2) {
+	return (v2f) {
 		deadzone(cs, AXIS_LEFTX) / AXIS_MAX,
 		deadzone(cs, AXIS_LEFTY) / AXIS_MAX
 	};
 }
 
-vf2 stick_vec_right(ControllerState* cs)
+v2f stick_vec_right(ControllerState* cs)
 {
-	return (vf2) {
+	return (v2f) {
 		deadzone(cs, AXIS_RIGHTX) / AXIS_MAX,
 		deadzone(cs, AXIS_RIGHTY) / AXIS_MAX
 	};
@@ -305,8 +305,8 @@ f32 stick_dir_left(ControllerState* cs)
 {
 	return SDL_atan2f
 	(
-	 	deadzone(cs, AXIS_LEFTX) / AXIS_MAX,
-	 	deadzone(cs, AXIS_LEFTY) / AXIS_MAX
+	 	deadzone(cs, AXIS_LEFTY) / AXIS_MAX,
+	 	deadzone(cs, AXIS_LEFTX) / AXIS_MAX
 	);
 }
 
@@ -314,8 +314,8 @@ f32 stick_dir_right(ControllerState* cs)
 {
 	return SDL_atan2f
 	(
-		deadzone(cs, AXIS_RIGHTX) / AXIS_MAX,
-		deadzone(cs, AXIS_RIGHTY) / AXIS_MAX
+		deadzone(cs, AXIS_RIGHTY) / AXIS_MAX,
+		deadzone(cs, AXIS_RIGHTX) / AXIS_MAX
 	);
 }
 

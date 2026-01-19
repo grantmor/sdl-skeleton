@@ -5,6 +5,7 @@
 #include <SDL3/SDL_video.h>
 
 #include "types.h"
+#include "platform_sdl.h"
 
 SDL_AppResult platform_event(AppState* as, SDL_Event* event)
 {
@@ -20,7 +21,7 @@ SDL_AppResult platform_event(AppState* as, SDL_Event* event)
 		{
 			case SDLK_ESCAPE:
 				return SDL_APP_SUCCESS;
-			case SDLK_F:
+			case SDLK_F11:
 			{
 				SDL_WindowFlags flags = SDL_GetWindowFlags(as->window);
 				if (flags & SDL_WINDOW_FULLSCREEN)

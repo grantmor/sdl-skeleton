@@ -1,28 +1,70 @@
 #pragma once
 
+#define MAX_RENDER_PHASES 8
+
 #include "SDL3/SDL.h"
-#include "platform_sdl.h"
+#include "types.h"
 
 typedef struct {
-	SDL_Texture* atlas;
+	SDL_Texture* data;
 	SDL_Time modified;
 	char* path;
-	
-	u32 width;
-	u32 height;
-} SpriteAtlas;
+} TextureAtlas;
+
+typedef enum {
+	ATLAS_BG_IDX,
+	ATLAS_TILE_IDX,
+	ATLAS_SPRITE_IDX,
+	ATLAS_COUNT,
+} AtlasIndex;
 
 typedef struct {
 	SDL_Renderer* sdl_renderer;
-	SpriteAtlas sprite_atlas;
-} Renderer;
+	TextureAtlas atlas[ATLAS_COUNT];
+	v2u render_size;
+} RenderCtx;
 
-void render_sprite_atlas_load(SDL_Renderer* renderer, SpriteAtlas* atlas);
+typedef enum {
+	RENDER_PHASE_TILE,	
+	RENDER_PHASE_SPRITE,
+	RENDER_PHASE_SHAPE,
+} RenderPhaseType;
 
-void platform_render(Renderer* renderer);
+typedef struct {
+	
+} TileRenderPhase;
+
+typedef struct {
+	
+} SpriteRenderPhase;
+
+typedef struct {
+	
+} ShapeRenderPhase;
+
+typedef struct {
+	RenderPhaseType type;
+	union {
+		TileRenderPhase tiles;
+	 	SpriteRenderPhase sprites;
+	 	ShapeRenderPhase shapes;
+	} RenderPhaseData;
+} RenderPhase;
+
+typedef struct {
+	RenderPhase render_phases[MAX_RENDER_PHASES];
+	u32 render_phase_count;
+} RenderList;
+
+void render_texture_atlas_load(SDL_Renderer* renderer, TextureAtlas* atlas);
+
+void render_clear(RenderCtx* rctx);
+
+void render_atlas(RenderCtx* rctx);
 
 void render_init(SDL_Window* window);
 
-void render_frame();
+void render_frame(RenderList* render_list);
 
 void render_free();
+

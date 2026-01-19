@@ -88,7 +88,6 @@ SDL_AppResult platform_init(void** appstate)
 	SDL_Window* window = SDL_CreateWindow("SDL3 Skeleton", 1280, 720, SDL_WINDOW_RESIZABLE);
 	as->window = window;
 
-	
 	render_init(window);
 	// if (!SDL_CreateWindowAndRenderer("SDL3 Skeleton", 1280, 720, SDL_WINDOW_RESIZABLE, &as->window, &as->renderer))
 	// {
