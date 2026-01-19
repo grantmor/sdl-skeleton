@@ -5,18 +5,18 @@
 #include "SDL3/SDL.h"
 #include "types.h"
 
-typedef struct {
-	SDL_Texture* data;
-	SDL_Time modified;
-	char* path;
-} TextureAtlas;
-
 typedef enum {
 	ATLAS_BG,
 	ATLAS_TILE,
 	ATLAS_SPRITE,
 	ATLAS_COUNT,
-} AtlasType;
+} TextureAtlasKind;
+
+typedef struct {
+	SDL_Texture* data;
+	SDL_Time modified;
+	char* path;
+} TextureAtlas;
 
 typedef struct {
 	SDL_Renderer* sdl_renderer;
@@ -60,7 +60,7 @@ void render_texture_atlas_load(SDL_Renderer* renderer, TextureAtlas* atlas);
 
 void render_clear(RenderCtx* rctx);
 
-void render_atlas(RenderCtx* rctx, AtlasType atlas_type);
+void render_atlas(RenderCtx* rctx, TextureAtlasKind atlas_type);
 
 void render_init(SDL_Window* window);
 

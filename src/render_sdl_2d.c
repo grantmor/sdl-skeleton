@@ -18,7 +18,6 @@ void render_texture_atlas_load(SDL_Renderer* renderer, TextureAtlas* atlas)
         return;
     }
 
-	INFO("atlas path: %s", atlas->path);
 	if (atlas->data)
 	{
 		SDL_DestroyTexture(atlas->data);
@@ -36,6 +35,8 @@ void render_texture_atlas_load(SDL_Renderer* renderer, TextureAtlas* atlas)
 		atlas->modified = platform_file_timestamp_get(atlas->path);
 		SDL_DestroySurface(sprite_atlas_surf);
 		SDL_SetTextureScaleMode(atlas->data, SDL_SCALEMODE_NEAREST);
+
+		INFO("%s successfully loaded.", atlas->path);
 	}
 }
 
@@ -65,7 +66,6 @@ void render_init(SDL_Window* window)
 
 		render_texture_atlas_load(g_rctx.sdl_renderer, &g_rctx.atlas[a]);
 	}
-
 }
 
 void render_clear(RenderCtx* rctx)
@@ -80,7 +80,7 @@ void render_clear(RenderCtx* rctx)
 	SDL_RenderFillRect(sdl_ren, &screen_rect);
 }
 
-void render_atlas(RenderCtx* rctx, AtlasType atlas_type)
+void render_atlas(RenderCtx* rctx, TextureAtlasKind atlas_type)
 {
 	SDL_Renderer* sdl_ren = rctx->sdl_renderer;
 	TextureAtlas* sprite_atlas = &rctx->atlas[ATLAS_SPRITE];
