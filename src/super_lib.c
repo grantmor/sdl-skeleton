@@ -13,7 +13,7 @@
 
 Arena arena_alloc_make(u8* backing_buffer, usize size)
 {
-	// FIXME: WARN or ERROR if 
+	ASSERT(size >= sizeof(*backing_buffer), "Requested allocator size greater than backing buffer size");
 	for (usize b=0; b<size; b++)
 	{
 		backing_buffer[b] = ARENA_INIT_VAL;
@@ -31,8 +31,7 @@ u8* arena_alloc(Arena* alloc, usize size)
 {
 	u8* result = NULL;
 
-	// Ensure memory is aligned to 16 bytes
-	usize aligned_size = (size + 7) & ~ 7;
+	usize aligned_size = (size + 15) & ~ 15;
 	if (alloc->used + aligned_size <= alloc->capacity)
 	{
 		result = alloc->data + alloc->used;
@@ -41,6 +40,9 @@ u8* arena_alloc(Arena* alloc, usize size)
 	else
 	{
 		ERROR("Allocator is full!");
+		ERROR("alloc.used: %d", alloc->used);
+		ERROR("alloc.capacity: %d", alloc->capacity);
+		ERROR("attempted allocation size: %d", size);
 		return NULL;
 	}
 
@@ -55,6 +57,7 @@ Arena* arena_reset(Arena* arena)
 
 void arena_free(Arena* arena)
 {
+	// FIXME: potantial bug here
 	SDL_free(arena->data);
 }
 

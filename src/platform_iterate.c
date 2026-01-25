@@ -188,10 +188,6 @@ SDL_AppResult platform_iterate(AppState* as)
 	game_step(as);
 	#endif
 
-	// game_step should return this later
-	RenderList render_list = (RenderList) {0};
- 	render_frame(&render_list);
-
 	platform_audio(&as->sound_manager);
 
 	return SDL_APP_CONTINUE;

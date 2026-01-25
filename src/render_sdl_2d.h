@@ -4,6 +4,20 @@
 
 #include "SDL3/SDL.h"
 #include "types.h"
+#include "../inc/cglm/struct.h"
+
+typedef struct {
+    u32 x, y; // Atlas offset
+    u32 w, h; // Frame size
+    i16 px, py; // Pivot Offset
+} TileFrame;
+
+// types: orthographic, isometric, projected2d
+typedef struct {
+	Pos2 pos;
+	Dir2 rot;
+	v2f zoom;
+} Camera2D;
 
 typedef enum {
 	ATLAS_BG,
@@ -25,30 +39,46 @@ typedef struct {
 } RenderCtx;
 
 typedef enum {
-	RENDER_PHASE_TILE,	
-	RENDER_PHASE_SPRITE,
-	RENDER_PHASE_SHAPE,
+	RENDER_PHASE_2D_AFFINE,
+	RENDER_PHASE_2D_PROJECTED,
+	RENDER_PHASE_2D_SHAPES,
+	RENDER_PHASE_3D_MODEL,
+	RENDER_PHASE_POST,
 } RenderPhaseType;
 
 typedef struct {
-	
-} TileRenderPhase;
+	// mat3s view;
+	Camera2D camera;
+	TextureAtlasKind atlas_kind;
+	TileFrame* tiles;
+	u32* tile_indices;
+	v2f* tile_positions;
+	u32 tile_index_count;
+} AffinePhase2D;
 
 typedef struct {
-	
-} SpriteRenderPhase;
+	mat4 view;
+	mat4 proj;
+	TextureAtlasKind atlas_kind;
+} ProjectedPhase2D;
 
 typedef struct {
-	
-} ShapeRenderPhase;
+	mat3 view;
+} ShapePhase;
+
+typedef struct {
+	mat4 view;
+	mat4 proj;
+} ModelPhase;
 
 typedef struct {
 	RenderPhaseType type;
 	union {
-		TileRenderPhase tiles;
-	 	SpriteRenderPhase sprites;
-	 	ShapeRenderPhase shapes;
-	} RenderPhaseData;
+	 	AffinePhase2D affine_2d;
+	 	ProjectedPhase2D projected_2d;
+	 	ShapePhase shape_2d;
+	 	ModelPhase model;
+	} render_phase_data;
 } RenderPhase;
 
 typedef struct {
@@ -62,7 +92,7 @@ void render_clear(RenderCtx* rctx);
 
 void render_atlas(RenderCtx* rctx, TextureAtlasKind atlas_type);
 
-void render_init(SDL_Window* window);
+void render_make(SDL_Window* window, v2u fb_size);
 
 void render_frame(RenderList* render_list);
 

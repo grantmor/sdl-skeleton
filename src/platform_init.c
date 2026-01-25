@@ -63,7 +63,6 @@ SDL_AppResult platform_init(void** appstate)
 	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD | SDL_INIT_AUDIO);
 
 	//FIXME: Handle errors
-
 	AppState* as = (AppState*) SDL_calloc(1, sizeof(AppState));
 
 	// Function pointers for platform API
@@ -74,26 +73,34 @@ SDL_AppResult platform_init(void** appstate)
 		.platform_info_ptr = platform_info,
 		.platform_warn_ptr = platform_warn,
 		.platform_error_ptr = platform_error,
+		.render_frame_ptr = render_frame,
 	};
 
 	Arena app_arena = arena_alloc_make(as->memory.app_arena_buffer, ARENA_APP_SIZE);
 	Arena app_scratch = arena_alloc_make(as->memory.app_scratch_buffer, SCRATCH_APP_SIZE);
 
-	Arena frame_arena = arena_alloc_make(as->memory.frame_arena_buffer, ARENA_APP_SIZE);
-	Arena frame_scratch = arena_alloc_make(as->memory.app_scratch_buffer, SCRATCH_APP_SIZE);
+	Arena game_arena = arena_alloc_make(as->game_state.game_arena_buffer, ARENA_GAME_SIZE);
+	Arena game_scratch = arena_alloc_make(as->game_state.game_scratch_buffer, SCRATCH_GAME_SIZE);
+
+	Arena frame_arena = arena_alloc_make(as->frame_state.frame_arena_buffer, ARENA_FRAME_SIZE);
+	Arena frame_scratch = arena_alloc_make(as->frame_state.frame_scratch_buffer, SCRATCH_FRAME_SIZE);
+
+	as->memory.app_arena = app_arena;
+	as->memory.app_scratch = app_scratch;
+	as->game_state.game_arena = game_arena;
+	as->game_state.game_scratch = game_scratch;
+	as->frame_state.frame_arena = frame_arena;
+	as->frame_state.frame_scratch = frame_scratch;
 
 	MemoryContext mctx = (MemoryContext) {.arena = &app_arena, .scratch = &app_scratch};
 
 	// Window
-	SDL_Window* window = SDL_CreateWindow("SDL3 Skeleton", 1280, 720, SDL_WINDOW_RESIZABLE);
+	v2u win_size = (v2u) {1280, 720};
+	SDL_Window* window = SDL_CreateWindow("SDL3 Skeleton", win_size.x, win_size.y, SDL_WINDOW_RESIZABLE);
 	as->window = window;
 
-	render_init(window);
-	// if (!SDL_CreateWindowAndRenderer("SDL3 Skeleton", 1280, 720, SDL_WINDOW_RESIZABLE, &as->window, &as->renderer))
-	// {
-	// 	ERROR("Failed to create window/renderer: %s.", SDL_GetError());
-	// 	return SDL_APP_FAILURE;		
-	// }
+	v2u fb_size = (v2u) {320, 180};
+	render_make(window, fb_size);
 
 	// Input
 	// Pump events to ensure gamepad can be accessed
@@ -132,6 +139,29 @@ SDL_AppResult platform_init(void** appstate)
 	};
 	as->time = time;
 
+	// Video
+
+	// FIXME: Hard-coded for now, sprite system automation comes later
+    // Populate Animation Frames 
+    as->video.tile_frames = (TileFrame*) arena_alloc(mctx.arena, sizeof(TileFrame) * MAX_ANIMATION_FRAMES);
+    as->video.tile_frames[0] = (TileFrame) {
+        .x = 2,
+        .y = 4,
+        .w = 20,
+        .h = 28,
+        .px = 10,
+        .py = 28, 
+    };
+
+    // Populate Sprite Animation Table
+    as->video.sprite_animation_map[MAIN][IDLE] = MAIN_IDLE;
+    as->video.animations[MAIN_IDLE] = (SpriteAnimation)
+    {
+        .anim_speed = 1.0,
+        .start_frame = 0,
+        .frame_count = 1,
+        .loop = true,
+    };
 
 	// Audio
 	SoundManager* sound_manager = &as->sound_manager;

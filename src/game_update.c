@@ -4,6 +4,11 @@
 
 #include "platform_sdl.h"
 
+// Replace with render_common.h
+#include "render_sdl_2d.h"
+#include "super_lib.h"
+#include "types.h"
+
 static PlatformAPI* g_platform = NULL;
 
 #ifdef __EMSCRIPTEN__
@@ -31,18 +36,126 @@ static PlatformAPI* g_platform = NULL;
 #include "input.h"
 #include "input.c"
 
+#include "game_update.h"
+#include "entity.h"
+
+static bool g_game_initialized = false;
+
 void game_init(PlatformAPI* platform) {
     g_platform = platform;
+	// INFO("Render frame ptr: %p", platform->render_frame_ptr);
+}
+
+void entity_player_make()
+{
+    
+}
+
+// Temporary for testing things
+// FIXME: PASS IN ENTITY STORE
+EntityHandle entity_make(AppState* as)
+{
+    GameState* gs = &as->game_state;
+    EntityStore* es = &as->game_state.entity_store;
+    MemoryContext mctx = {&gs->game_arena, &gs->game_scratch};
+
+    SpriteAnimationState anim_state = (SpriteAnimationState) {
+        .frame = 0,
+        .time_elapsed = 0.0
+    };
+
+    Sprite sprite = (Sprite) {
+        .sprite_kind = MAIN,
+        .anim_state = anim_state,
+        .current_animation = MAIN_IDLE
+    };
+
+    ASSERT(es->entity_count <= MAX_ENTITIES, "Exceeded max Entity count!!!");
+
+    es->entities[es->entity_count] = (Entity) {
+       .dir = {0.0, 0.0},            
+       .pos = {160.0, 90.0},
+       .sprite = sprite,
+    };
+
+    es->entity_count += 1; 
+
+    return (EntityHandle) {.index = es->entity_count - 1, .generation = 0};
+}
+
+void game_setup(AppState* as)
+{
+    MemoryContext mctx = {&as->game_state.game_arena, &as->game_state.game_scratch};
+    EntityStore* es = &as->game_state.entity_store;
+    Video* video = &as->video;
+
+    // Setup Eneity List
+    es->entities = (Entity*) arena_alloc(mctx.arena, sizeof(Entity) * MAX_ENTITIES);
+    
+    // Thrown away for now
+    EntityHandle main = entity_make(as);
+}
+
+RenderList* render_list_build(AppState* as)
+{
+    MemoryContext mctx = (MemoryContext) {.arena = &as->frame_state.frame_arena, .scratch = &as->frame_state.frame_scratch};
+    EntityStore* es = &as->game_state.entity_store;
+    Video* video = &as->video;
+
+    RenderList* rl = (RenderList*) arena_alloc(mctx.arena, sizeof(RenderList));
+    u32* tile_indices = (u32*) arena_alloc(mctx.arena, sizeof(u32) * es->entity_count);
+    v2f* tile_positions = (v2f*) arena_alloc(mctx.arena, sizeof(v2f) * es->entity_count);
+
+
+    // Entities
+    for (usize t=0; t<es->entity_count; t++)
+    {
+        tile_indices[t] = 0;// FIXME: Can't finish this until animation is done
+        tile_positions[t] = (v2f) es->entities[t].pos; // Handle shouldn't be needed unless dead entities aren't cleaned up
+    }
+
+    // TODO: Follow with other types of things that might need to render a tile
+    // UI element for example, if that's a different type
+
+    // Create Tile list
+	*rl = (RenderList)
+	{
+        .render_phase_count = 1,
+        .render_phases =
+        {
+            (RenderPhase)
+            {
+                .type = RENDER_PHASE_2D_AFFINE,
+                .render_phase_data = (AffinePhase2D)
+                {
+                    .camera = (Camera2D)
+                    {
+                        .pos = 0,0,
+                        .rot = (Dir2) {0.0, 0.0},
+                        .zoom = (v2f) {1.0, 1.0},
+                    },
+                    .atlas_kind = ATLAS_SPRITE,
+                    .tiles = video->tile_frames,
+                    .tile_indices = tile_indices,
+                    .tile_positions = tile_positions,
+                    .tile_index_count = es->entity_count,
+                }
+            } 
+        }, 
+    };
+
+   return rl; 
 }
 
 void game_update(AppState* as)
 {
-	
-}
-
-void render_list_build(AppState* as)
-{
-	
+    ASSERT(g_platform != NULL, "g_platform is NULL!");
+    if (!g_game_initialized)
+    {
+        game_setup(as);
+        g_game_initialized = true;
+    }
+	as->platform_api.render_frame_ptr(render_list_build(as));
 }
 
 void sound_list_add(SoundManager* sound_man, SoundID sound_id)
@@ -115,18 +228,29 @@ void platform_gamepad_update(AppState* as) {
     }
 }
 
+void frame_begin(AppState* as)
+{
+    sound_list_clear(&as->sound_manager);
+    time_update(&as->time);
+}
+
+void frame_end(AppState* as) 
+{
+    arena_reset(&as->frame_state.frame_arena);
+    arena_reset(&as->frame_state.frame_scratch);
+}
+
 void game_step(AppState* as)
 {
     // game_init(&as->platform_api);
-    sound_list_clear(&as->sound_manager);
-    time_update(&as->time);
+    frame_begin(as);
 
 	platform_gamepad_update(as);
     platform_input(&as->platform_input, &as->game_input);    
     game_input(&as->game_input);
 
     game_update(as);
-
-    render_list_build(as);
     audio_list_build(as, &as->game_input);
+
+    frame_end(as);
 }

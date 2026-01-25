@@ -1,5 +1,7 @@
 #include "platform_sdl.h"
 
+void game_setup(AppState* as);
+
 void game_update(AppState* as);
 
 void build_render_list(AppState* as);

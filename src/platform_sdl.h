@@ -11,13 +11,20 @@
 #include "super_lib.h"
 // #ifdef
 #include "render_sdl_2d.h"
+#include "entity.h"
 // #include "super_lib.c"
-
+// 
 #define ARENA_APP_SIZE MB(8)
 #define SCRATCH_APP_SIZE MB(8)
 
-#define ARENA_FRAME_SIZE MB(64)
-#define SCRATCH_FRAME_SIZE MB(64)
+#define ARENA_GAME_SIZE MB(8)
+#define SCRATCH_GAME_SIZE MB(8)
+
+#define ARENA_SCENE_SIZE MB(8)
+#define SCRATCH_SCENE_SIZE MB(8)
+
+#define ARENA_FRAME_SIZE MB(8)
+#define SCRATCH_FRAME_SIZE MB(8)
 
 typedef enum {
 	TEXT_COLOR_BLACK,
@@ -65,24 +72,46 @@ typedef struct {
 	Arena app_arena;
 	Arena app_scratch;
 
-	Arena frame_arena;
-	Arena frame_scratch;
-
 	u8 app_arena_buffer[ARENA_APP_SIZE]; 
 	u8 app_scratch_buffer[SCRATCH_APP_SIZE]; 
+} Memory;
 
+// These pointers should probably be typed...?
+typedef struct {
+	Arena game_arena;
+	Arena game_scratch;
+
+	u8 game_arena_buffer[ARENA_GAME_SIZE];
+	u8 game_scratch_buffer[SCRATCH_GAME_SIZE];
+
+	EntityStore entity_store;
+
+	// Other things like scene graph, mode stack, etc.
+	// Make sure to clear these pointers when the game arena is reset!!!
+	// That goes for any other lifetime/state referenced here
+} GameState;
+
+typedef struct {
+	Arena frame_arena;
+	Arena frame_scratch;
+	
 	u8 frame_arena_buffer[ARENA_FRAME_SIZE]; 
 	u8 frame_scratch_buffer[SCRATCH_FRAME_SIZE];
-} Memory;
+} FrameState;
 
 typedef struct {
 	void (*platform_trace_ptr) (const char* fmt, ...);
 	void (*platform_info_ptr) (const char* fmt, ...);
 	void (*platform_warn_ptr) (const char* fmt, ...);
 	void (*platform_error_ptr) (const char* fmt, ...);
+	void (*render_frame_ptr) (RenderList* render_list);
 } PlatformAPI;
 
-// extern PlatformAPI* g_platform_api;
+typedef struct {
+	TileFrame* tile_frames;
+	SpriteAnimationKind sprite_animation_map[SPRITE_KIND_COUNT][SPRITE_ANIMATION_CLASS_COUNT];
+	SpriteAnimation animations[MAX_ANIMATIONS];
+} Video;
 
 typedef struct {
 	SDL_Window* window;
@@ -94,7 +123,8 @@ typedef struct {
 	GameInput game_input;
 
 	// Video
-	RenderList render_list;
+	// Render render;
+	Video video;
 	
 	// Sound
 	SoundManager sound_manager;
@@ -104,6 +134,13 @@ typedef struct {
 
 	// Pointer Table
 	PlatformAPI platform_api;
+
+	// Game State
+	GameState game_state;
+
+	// Frame State
+	FrameState frame_state;
+
 } AppState;
 
 static PlatformAPI* g_platform_api;
@@ -139,7 +176,7 @@ void platform_error(const char* fmt, ...);
 	#define ASSERT(x, ...) \
 	{ \
 		if (!(x)) \
-		{\
+		{ \
 			ERROR(__VA_ARGS__); \
 			__builtin_debugtrap(); \
 		} \

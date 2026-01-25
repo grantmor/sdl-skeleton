@@ -2,7 +2,10 @@
 #include "render_sdl_2d.h"
 #include "platform_sdl.h"
 #include <SDL3/SDL_oldnames.h>
+#include <SDL3/SDL_rect.h>
 #include <SDL3/SDL_render.h>
+
+#include "types.h"
 
 static RenderCtx g_rctx;
 
@@ -40,14 +43,13 @@ void render_texture_atlas_load(SDL_Renderer* renderer, TextureAtlas* atlas)
 	}
 }
 
-void render_init(SDL_Window* window)
+void render_make(SDL_Window* window, v2u fb_size)
 {
 	g_rctx = (RenderCtx) {0};
 	g_rctx.sdl_renderer = SDL_CreateRenderer(window, NULL);
+	g_rctx.render_size = fb_size;
 
-	g_rctx.render_size = (v2u) {640, 480};
-
-	SDL_SetRenderLogicalPresentation(g_rctx.sdl_renderer, g_rctx.render_size.x, g_rctx.render_size.y, SDL_LOGICAL_PRESENTATION_LETTERBOX);
+	SDL_SetRenderLogicalPresentation(g_rctx.sdl_renderer, fb_size.x, fb_size.y, SDL_LOGICAL_PRESENTATION_LETTERBOX);
 
 	for (usize a=0; a<ATLAS_COUNT; a++)
 	{
@@ -83,7 +85,7 @@ void render_clear(RenderCtx* rctx)
 void render_atlas(RenderCtx* rctx, TextureAtlasKind atlas_type)
 {
 	SDL_Renderer* sdl_ren = rctx->sdl_renderer;
-	TextureAtlas* sprite_atlas = &rctx->atlas[ATLAS_SPRITE];
+	TextureAtlas* sprite_atlas = &rctx->atlas[atlas_type];
 
 	if (platform_file_timestamp_get(sprite_atlas->path) > sprite_atlas->modified)
 	{
@@ -95,10 +97,54 @@ void render_atlas(RenderCtx* rctx, TextureAtlasKind atlas_type)
 	SDL_RenderTexture(sdl_ren, sprite_atlas->data, NULL, &sprite_rect);
 }
 
+void render_tile(RenderCtx* rctx, TextureAtlasKind atlas_type, TileFrame frame, v2f loc)
+{
+	SDL_Renderer* sdl_ren = rctx->sdl_renderer;
+	TextureAtlas* sprite_atlas = &rctx->atlas[atlas_type];
+
+	if (platform_file_timestamp_get(sprite_atlas->path) > sprite_atlas->modified)
+	{
+		render_texture_atlas_load(sdl_ren, sprite_atlas);
+	}
+
+	SDL_FRect sprite_rect = (SDL_FRect) {frame.x, frame.y, frame.w, frame.h};
+	SDL_FRect dest_rect = (SDL_FRect) {loc.x - frame.px, loc.y - frame.py, frame.w, frame.h};
+	SDL_RenderTexture(sdl_ren, sprite_atlas->data, &sprite_rect, &dest_rect);
+}
+
+void render_render_list(RenderCtx* rctx, RenderList* render_list)
+{
+	for (usize p=0; p<render_list->render_phase_count; p++)
+	{
+		RenderPhase phase = render_list->render_phases[p];
+		switch(phase.type)
+		{
+			case RENDER_PHASE_2D_AFFINE:
+			{
+				// RenderPhase affine_phase = phase.render_phase_data.affine_2d;
+				for (usize t=0; t<phase.render_phase_data.affine_2d.tile_index_count; t++ )
+				{
+					render_tile
+					(
+						rctx,
+						phase.render_phase_data.affine_2d.atlas_kind,
+						phase.render_phase_data.affine_2d.tiles[phase.render_phase_data.affine_2d.tile_indices[t]],
+						phase.render_phase_data.affine_2d.tile_positions[t]
+					);	
+				}
+				break;	
+			}
+			default:
+				break;
+		}
+	}
+}
+
 void render_frame(RenderList* render_list)
 {
 	render_clear(&g_rctx);
-	render_atlas(&g_rctx, ATLAS_SPRITE);
+	render_atlas(&g_rctx, ATLAS_TILE);
+	render_render_list(&g_rctx, render_list);
 	SDL_RenderPresent(g_rctx.sdl_renderer);
 }
 

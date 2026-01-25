@@ -59,8 +59,8 @@ echo symbols: $symbols
 
 rm ./build/native/*.so
 if [[ "$target" == native ]]; then
-  clang -std=c99 $symbols -fPIC -shared ./src/game_update.c -I./src -o ./build/native/game_update.so $defines
-  clang -std=c99 $symbols ./src/platform_sdl.c -o ./build/native/game -I/usr/include/SDL3 -lSDL3 $defines
+  clang -std=c99 $symbols -fPIC -shared ./src/game_update.c -I./src -I./inc -o ./build/native/game_update.so $defines
+  clang -std=c99 $symbols ./src/platform_sdl.c -o ./build/native/game -I/usr/include/SDL3 -I/inc -lSDL3 $defines
 elif [[ "$target" == web ]]; then
-  emcc -std=c99 ./src/platform_sdl.c ./lib/web/libSDL3.a -o ./build/web/index.html -I./inc/web -sINITIAL_MEMORY=$memory --embed-file ./res@./res -sUSE_PTHREADS=1 $symbols
+  emcc -std=c99 ./src/platform_sdl.c ./lib/web/libSDL3.a -o ./build/web/index.html -I./inc/web -I./inc -sINITIAL_MEMORY=$memory --embed-file ./res@./res -sUSE_PTHREADS=1 $symbols
 fi
