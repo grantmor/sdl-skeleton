@@ -284,39 +284,51 @@ i16 deadzone(ControllerState* cs, ControllerAxisMap axis)
 	return val;
 }
 
+v2f v2f_normalize(v2f v)
+{
+	f32 length = sqrt(v.x * v.x + v.y * v.y);		
+	if (length == 0.0) return (v2f) {0.0, 0.0};
+	return (v2f) {.x = v.x / length, .y = v.y / length};
+}
+
 v2f stick_vec_left(ControllerState* cs)
 {
 	return (v2f) {
-		deadzone(cs, AXIS_LEFTX) / AXIS_MAX,
-		deadzone(cs, AXIS_LEFTY) / AXIS_MAX
+		(f32) deadzone(cs, AXIS_LEFTX) / AXIS_MAX,
+		(f32) deadzone(cs, AXIS_LEFTY) / AXIS_MAX
 	};
 }
 
 v2f stick_vec_right(ControllerState* cs)
 {
 	return (v2f) {
-		deadzone(cs, AXIS_RIGHTX) / AXIS_MAX,
-		deadzone(cs, AXIS_RIGHTY) / AXIS_MAX
+		(f32) deadzone(cs, AXIS_RIGHTX) / AXIS_MAX,
+		(f32) deadzone(cs, AXIS_RIGHTY) / AXIS_MAX
 	};
 }
 
-// FIXME: Write homebrew atan2f to eliminate dependency on SDL
-f32 stick_dir_left(ControllerState* cs)
+Dir2 stick_dir_left(ControllerState* cs)
 {
-	return SDL_atan2f
+	return v2f_normalize
 	(
-	 	deadzone(cs, AXIS_LEFTY) / AXIS_MAX,
-	 	deadzone(cs, AXIS_LEFTX) / AXIS_MAX
-	);
+	 	(v2f)
+	 	{
+		 	(f32) deadzone(cs, AXIS_LEFTX) / AXIS_MAX,
+		 	(f32) deadzone(cs, AXIS_LEFTY) / AXIS_MAX
+	 	}
+	 );
 }
 
-f32 stick_dir_right(ControllerState* cs)
+Dir2 stick_dir_right(ControllerState* cs)
 {
-	return SDL_atan2f
+	return v2f_normalize
 	(
-		deadzone(cs, AXIS_RIGHTY) / AXIS_MAX,
-		deadzone(cs, AXIS_RIGHTX) / AXIS_MAX
-	);
+	 	(v2f)
+	 	{
+		 	(f32) deadzone(cs, AXIS_RIGHTX) / AXIS_MAX,
+		 	(f32) deadzone(cs, AXIS_RIGHTY) / AXIS_MAX
+	 	}
+	 );
 }
 
 f32 stick_mag_left(ControllerState* cs)
@@ -452,22 +464,24 @@ void game_input(GameInput* game_input)
 	// System
 	if (button_pressed(cs, BUTTON_START)) TRACE("Start Button Pressed");
 	if (button_pressed(cs, BUTTON_SELECT)) TRACE("Select Button Pressed");
-
+*/
 	TRACE("Left Stick Vector x: %f", stick_vec_left(cs).x); 
 	TRACE("Left Stick Vector y: %f", stick_vec_left(cs).y); 
 
-	TRACE("Left Stick Dir: %f", stick_dir_left(cs));
+	TRACE("Left Stick Dir x: %f", stick_dir_left(cs).x);
+	TRACE("Left Stick Dir y: %f", stick_dir_left(cs).y);
 	TRACE("Left Stick Mag: %f", stick_mag_left(cs));
 
 	TRACE("Right Stick Vector x: %f", stick_vec_right(cs).x);
 	TRACE("Right Stick Vector y: %f", stick_vec_right(cs).y);
 
-	TRACE("Right Stick Dir: %f", stick_dir_right(cs));
+	TRACE("Right Stick Dir x: %f", stick_dir_right(cs).x);
+	TRACE("Right Stick Dir y: %f", stick_dir_right(cs).y);
 	TRACE("Right Stick Mag: %f", stick_mag_right(cs));
 
 	TRACE("Left Trigger Mag: %f", trigger_mag_left(cs));
 	TRACE("Right Trigger Mag: %f", trigger_mag_right(cs));
-
+/*
 	// Controller Axes
 	TRACE("Axis 0:%i", cs->axis[0]);
 	TRACE("Axis 1:%i", cs->axis[1]);
