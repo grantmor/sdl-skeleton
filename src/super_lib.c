@@ -121,7 +121,6 @@ String str_concat(MemoryContext* mctx, String str_a, String str_b)
 c8* str_to_cstring(MemoryContext* mctx, String str)
 {
 	SubArena sub = arena_sub_start(mctx->scratch);
-	// c8 cstr[str.length+1];
 		String cstr = str_alloc(mctx->arena, str.length+1);
 
 		for (usize c=0; c<str.length; c++)
@@ -132,7 +131,6 @@ c8* str_to_cstring(MemoryContext* mctx, String str)
 
 		u8* mem_ptr = arena_alloc(mctx->arena, str.length+1);
 		memcpy(mem_ptr, cstr.text, str.length+1);
-
 	arena_sub_end(sub);
 
 	return (c8*) mem_ptr;

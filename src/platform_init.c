@@ -22,7 +22,6 @@
 #include "super_lib.c"
 #include "platform_sdl.h"
 
-
 // #ifdef RENDER_SDL_2D
  	#include "render_sdl_2d.h"
 	#include "render_sdl_2d.c"
