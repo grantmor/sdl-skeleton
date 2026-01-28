@@ -70,7 +70,7 @@ EntityHandle entity_make(AppState* as)
         .current_animation = MAIN_IDLE
     };
 
-    ASSERT(es->entity_count <= MAX_ENTITIES, "Exceeded max Entity count!!!");
+    ASSERT(es->entity_count < MAX_ENTITIES, "Exceeding max Entity count!!!");
 
     es->entities[es->entity_count] = (Entity) {
        .dir = {0.0, 0.0},            
