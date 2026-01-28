@@ -109,29 +109,31 @@ String str_make(MemoryContext* mctx, c8* cstring)
 String str_concat(MemoryContext* mctx, String str_a, String str_b)
 {
 	u64 length = str_a.length + str_b.length + 1;
+	String str_c = str_alloc(mctx->arena, length);
 
-	c8 cstring[length];
+	memcpy(str_c.text, str_a.text, str_a.length);
+	memcpy(str_c.text + str_a.length, str_b.text, str_b.length);
+	str_c.text[length-1] = '\0';
 
-	memcpy(&cstring, str_a.text, str_a.length);
-	memcpy(&cstring[str_a.length], str_b.text, str_b.length);
-	cstring[length-1] = '\0';
-
-	String str_c = str_make(mctx, cstring);
 	return str_c;
 }
 
 c8* str_to_cstring(MemoryContext* mctx, String str)
 {
-	c8 cstr[str.length+1];
+	SubArena sub = arena_sub_start(mctx->scratch);
+	// c8 cstr[str.length+1];
+		String cstr = str_alloc(mctx->arena, str.length+1);
 
-	for (usize c=0; c<str.length; c++)
-	{
-		cstr[c] = str.text[c];
-	}
-	cstr[str.length] = '\0';
+		for (usize c=0; c<str.length; c++)
+		{
+			cstr.text[c] = str.text[c];
+		}
+		cstr.text[str.length] = '\0';
 
-	u8* mem_ptr = arena_alloc(mctx->arena, str.length+1);
-	memcpy(mem_ptr, cstr, str.length+1);
+		u8* mem_ptr = arena_alloc(mctx->arena, str.length+1);
+		memcpy(mem_ptr, cstr.text, str.length+1);
+
+	arena_sub_end(sub);
 
 	return (c8*) mem_ptr;
 }

@@ -437,8 +437,8 @@ void game_input(GameInput* game_input)
 	ControllerState* cs = &game_input->controller_state;
 
 	// Face Buttons
+/*
 	if (button_pressed(cs, BUTTON_NORTH)) TRACE("North Button Pressed");
-	/*
 	if (button_pressed(cs, BUTTON_SOUTH)) TRACE("South Button Pressed");
 	if (button_pressed(cs, BUTTON_EAST)) TRACE("East Button Pressed");
 	if (button_pressed(cs, BUTTON_WEST)) TRACE("West Button Pressed");
@@ -464,7 +464,7 @@ void game_input(GameInput* game_input)
 	// System
 	if (button_pressed(cs, BUTTON_START)) TRACE("Start Button Pressed");
 	if (button_pressed(cs, BUTTON_SELECT)) TRACE("Select Button Pressed");
-*/
+
 	TRACE("Left Stick Vector x: %f", stick_vec_left(cs).x); 
 	TRACE("Left Stick Vector y: %f", stick_vec_left(cs).y); 
 
@@ -481,7 +481,7 @@ void game_input(GameInput* game_input)
 
 	TRACE("Left Trigger Mag: %f", trigger_mag_left(cs));
 	TRACE("Right Trigger Mag: %f", trigger_mag_right(cs));
-/*
+
 	// Controller Axes
 	TRACE("Axis 0:%i", cs->axis[0]);
 	TRACE("Axis 1:%i", cs->axis[1]);
